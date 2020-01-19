@@ -1,0 +1,247 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "environment": {
+            "type": "string"
+        },
+        "vmName": {
+            "type": "string"
+        },
+        "subnetName": {
+            "type": "string"
+        },
+        "virtualNetworkName": {
+            "type": "string"
+        },
+        "virtualMachineSize": {
+            "type": "string"
+        },
+        "privateIp": {
+            "type": "string"
+        },
+        "adminUsername": {
+            "type": "string"
+        },
+        "adminPassword": {
+            "type": "securestring"
+        },
+        "createAppSecGroup": {
+            "type":"string",
+            "defaultValue":"new",
+			"allowedValues": [
+                "create",
+                "exist"
+			]
+        },
+        "appSecGroup": {
+            "type":"string"
+        },
+        "myWorkspaceId": {
+            "type":"string"
+        },
+        "myWorkspaceKey": {
+            "type":"string"
+        },
+        "networkResourceGroup": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().name]"
+        }
+    },
+    "variables": {
+        "location":"[resourceGroup().location]",
+        "diagAcctName": "[concat(parameters('vmName'),uniqueString(resourceGroup().id))]",
+        "nicName": "[concat(parameters('vmName'),uniqueString(resourceGroup().id))]",
+        "vnetId": "[resourceId(parameters('networkResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
+        "nicRef": "[concat(variables('nicName'),parameters('createAppSecGroup'))]"
+    },
+    "resources": [
+        {
+            "name": "[variables('diagAcctName')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-04-01",
+            "sku": {
+              "name": "Standard_LRS"
+            },
+            "kind": "StorageV2",
+            "location": "[variables('location')]",
+            "tags": {
+                "Environment":"[parameters('environment')]"
+            },
+            "properties": {
+              "accessTier": "Hot",
+              "supportsHttpsTrafficOnly": true
+            },
+            "resources": []
+        },
+        {
+            "condition": "[equals(parameters('createAppSecGroup'),'create')]",
+            "name": "[parameters('appSecGroup')]",
+            "type": "Microsoft.Network/applicationSecurityGroups",
+            "apiVersion": "2019-09-01",
+            "location": "[variables('location')]",
+            "tags": {
+                "environment":"[parameters('environment')]"
+            },
+            "properties": {}
+        },
+        {
+            "condition": "[equals(parameters('createAppSecGroup'),'create')]",
+            "name": "[concat(variables('nicName'),'create')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2018-11-01",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/applicationSecurityGroups/', parameters('appSecGroup'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAddress":"[parameters('privateIp')]",
+                            "privateIPAllocationMethod": "Static",
+                            "applicationSecurityGroups":[
+                                {
+                                    "id":"[resourceId('Microsoft.Network/applicationSecurityGroups', parameters('appSecGroup'))]"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "tags": {}
+        },
+        {
+            "condition": "[equals(parameters('createAppSecGroup'),'exist')]",
+            "name": "[concat(variables('nicName'),'exist')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2018-11-01",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/applicationSecurityGroups/', parameters('appSecGroup'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAddress":"[parameters('privateIp')]",
+                            "privateIPAllocationMethod": "Static",
+                            "applicationSecurityGroups":[
+                                {
+                                    "id":"[resourceId(parameters('networkResourceGroup'), 'Microsoft.Network/applicationSecurityGroups', parameters('appSecGroup'))]"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "tags": {}
+        },
+        {
+            "name": "[parameters('vmName')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2018-10-01",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'),parameters('createAppSecGroup'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', variables('diagAcctName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('virtualMachineSize')]"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "createOption": "fromImage",
+                        "managedDisk": {
+                            "storageAccountType": "StandardSSD_LRS"
+                        }
+                    },
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2016-Datacenter",
+                        "version": "latest"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicRef'))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[parameters('vmName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "windowsConfiguration": {
+                        "enableAutomaticUpdates": true,
+                        "provisionVmAgent": true
+                    }
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[concat('https://', variables('diagAcctName'), '.blob.core.windows.net/')]"
+                    }
+                }
+            },
+            "tags": {},
+            "resources": [
+                {
+                    "type": "extensions",
+                    "name": "OMSExtension",
+                    "apiVersion": "2019-03-01",
+                    "location": "[variables('location')]",
+                    "dependsOn": [
+                        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
+                    ],
+                    "properties": {
+                        "publisher": "Microsoft.EnterpriseCloud.Monitoring",
+                        "type": "MicrosoftMonitoringAgent",
+                        "typeHandlerVersion": "1.0",
+                        "autoUpgradeMinorVersion": true,
+                        "settings": {
+                            "workspaceId": "[parameters('myWorkspaceId')]"
+                        },
+                        "protectedSettings": {
+                            "workspaceKey": "[parameters('myWorkspaceKey')]"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "microsoft.network-watcher-windows-20190601220444",
+            "apiVersion": "2015-01-01",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "incremental",
+                "templateLink": {
+                    "uri": "https://gallery.azure.com/artifact/20161101/microsoft.network-watcher-windows-arm.1.4.14/Artifacts/MainTemplate.json"
+                },
+                "parameters": {
+                    "vmName": {
+                        "value": "[parameters('vmName')]"
+                    },
+                    "location": {
+                        "value": "[variables('location')]"
+                    }
+                }
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
+            ]
+        }
+    ]
+}
