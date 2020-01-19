@@ -750,6 +750,28 @@
                         }
                     },
                     {
+                        "name":"AlloWinRmMgmt",
+                        "properties": {
+                            "description": "Allow WinRM management from AADC to AD FS for trust management of Azure AD",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "5985-5986",
+                            "sourceApplicationSecurityGroups": [
+                                {
+                                    "id": "[resourceId('Microsoft.Network/applicationSecurityGroups', variables('aadcAppSecGroupName'))]"
+                                }
+                            ],
+                            "destinationApplicationSecurityGroups": [
+                                {
+                                    "id": "[resourceId('Microsoft.Network/applicationSecurityGroups', variables('adfsAppSecGroupName'))]"
+                                }
+                            ],
+                            "access":"Allow",
+                            "priority": 104,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
                         "name":"DenyAllInbound",
                         "properties": {
                             "description": "Deny all inbound traffic",
