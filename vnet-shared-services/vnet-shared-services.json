@@ -683,7 +683,7 @@
                             "description": "Allow certificate enrollment",
                             "protocol": "Tcp",
                             "sourcePortRange": "*",
-                            "destinationPortRange": "443",
+                            "destinationPortRange": "4000",
                             "sourceAddressPrefix": "VirtualNetwork",
                             "destinationApplicationSecurityGroups": [
                                 {
@@ -692,6 +692,24 @@
                             ],
                             "access":"Allow",
                             "priority": 101,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
+                        "name":"AllowCrlLookup",
+                        "properties": {
+                            "description": "Allow CRL lookup",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "80",
+                            "sourceAddressPrefix": "*",
+                            "destinationApplicationSecurityGroups": [
+                                {
+                                    "id": "[resourceId('Microsoft.Network/applicationSecurityGroups', variables('adcsAppSecGroupName'))]"
+                                }
+                            ],
+                            "access":"Allow",
+                            "priority": 102,
                             "direction": "Inbound"
                         }
                     },
