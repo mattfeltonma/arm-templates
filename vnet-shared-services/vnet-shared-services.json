@@ -8,6 +8,13 @@
                 "description": "Value used for Environment applied to all taggable resources"
             }
         },
+        "vnetName": {
+            "type":"string",
+            "defaultValue": "vnet-shared",
+            "metadata": {
+                "description":"Name of Vnet"
+            }
+        },
         "ssVnetCIDR": {
             "type":"string",
             "defaultValue": "10.50.0.0/16",
@@ -68,7 +75,6 @@
     "variables": {
         "location": "[resourceGroup().location]",
         "apiVersionNum": "2019-09-01",
-        "ssVnetName":"vnet-shared",
         "bastionSubnetName": "AzureBastionSubnet",
         "internalADSubnetName": "snet-intad",
         "dmzADSubnetName": "snet-dmzad",
@@ -85,7 +91,9 @@
         "dmzAdNsgName": "nsg-dmzad",
         "mgmtNsgName": "nsg-mgmt",
         "bastionPublicIpName": "pip-bastion",
-        "bastionName": "bstss"
+        "bastionName": "bstss",
+        "vngPublicIpName": "pip-vngvpn",
+        "vngName":"vng-vpn"
     },
     "resources" : [
         {
@@ -831,7 +839,7 @@
         },
         {
             "type":"Microsoft.Network/virtualNetworks",
-            "name": "[variables('ssVnetName')]",
+            "name": "[parameters('vnetName')]",
             "apiVersion": "[variables('apiVersionNum')]",
             "location": "[variables('location')]",
             "dependsOn": [
@@ -928,7 +936,7 @@
             "location": "[variables('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/publicIpAddresses/', variables('bastionPublicIpName'))]",
-                "[concat('Microsoft.Network/virtualNetworks/', variables('ssVnetName'))]"
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('vnetName'))]"
             ],
             "tags": {
                 "Environment":"[parameters('environment')]"
@@ -939,7 +947,7 @@
                         "name": "bastionConfig",
                         "properties": {
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('ssVnetName'), variables('bastionSubnetName'))]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), variables('bastionSubnetName'))]"
                             },
                             "publicIPAddress": {
                                 "id": "[resourceId('Microsoft.Network/publicIpAddresses', variables('bastionPublicIpName'))]"
@@ -948,6 +956,54 @@
                         }
                     }   
                 ]
+            }
+        },
+        {
+            "name": "[variables('vngPublicIpName')]",
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "[variables('apiVersionNum')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "publicIpAllocationMethod": "Dynamic"
+            },
+            "sku": {
+                "name": "Basic"
+            },
+            "tags": {
+                "Environment":"[parameters('environment')]"
+            }
+        },
+        {
+            "apiVersion": "[variables('apiVersionNum')]",
+            "name": "[variables('vngName')]",
+            "type": "Microsoft.Network/virtualNetworkGateways",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('vngPublicIpName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('vnetName'))]"
+            ],
+            "properties": {
+                "gatewayType": "vpn",
+                "ipConfigurations": [
+                    {
+                        "name": "default",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), 'GatewaySubnet')]"
+                            },
+                            "publicIpAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('vngPublicIpName'))]"
+                            }
+                        }
+                    }
+                ],
+                "vpnType": "RouteBased",
+                "vpnGatewayGeneration": "Generation2",
+                "sku": {
+                    "name": "VpnGw2",
+                    "tier": "VpnGw2"
+                }
             }
         }
     ]   

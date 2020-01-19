@@ -5,6 +5,9 @@
         "environment": {
             "value":"demo"
         },
+        "vnetName": {
+            "value":"vnet-onprem"
+        },
         "ssVnetCIDR": {
             "value":"10.100.0.0/16"
         },
