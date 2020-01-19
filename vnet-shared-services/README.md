@@ -31,4 +31,4 @@ ASGs have been setup and used where possible in NSGs.  This includes ASGs for:
 * Management servers
 
 The environment is pictured below:
-![lab image](/lab_visual.png)
+![lab image](https://github.com/mattfeltonma/arm-templates/blob/master/vnet-shared-services/lab_visual.PNG)
