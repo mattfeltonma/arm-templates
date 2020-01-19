@@ -678,12 +678,12 @@
                         }
                     },
                     {
-                        "name":"AllowCertEnroll",
+                        "name":"AllowRpcMapper",
                         "properties": {
-                            "description": "Allow certificate enrollment",
+                            "description": "Allow RPC Mapper for AD CS",
                             "protocol": "Tcp",
                             "sourcePortRange": "*",
-                            "destinationPortRange": "4000",
+                            "destinationPortRange": "135",
                             "sourceAddressPrefix": "VirtualNetwork",
                             "destinationApplicationSecurityGroups": [
                                 {
@@ -692,6 +692,24 @@
                             ],
                             "access":"Allow",
                             "priority": 101,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
+                        "name":"AllowDynamicRpcPorts",
+                        "properties": {
+                            "description": "Allow Dynamic RPC ports for AD CS",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "49152-65535",
+                            "sourceAddressPrefix": "VirtualNetwork",
+                            "destinationApplicationSecurityGroups": [
+                                {
+                                    "id": "[resourceId('Microsoft.Network/applicationSecurityGroups', variables('adcsAppSecGroupName'))]"
+                                }
+                            ],
+                            "access":"Allow",
+                            "priority": 102,
                             "direction": "Inbound"
                         }
                     },
@@ -709,7 +727,7 @@
                                 }
                             ],
                             "access":"Allow",
-                            "priority": 102,
+                            "priority": 103,
                             "direction": "Inbound"
                         }
                     },
