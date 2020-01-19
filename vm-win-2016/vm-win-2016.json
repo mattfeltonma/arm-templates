@@ -114,7 +114,9 @@
                     }
                 ]
             },
-            "tags": {}
+            "tags": {
+                "Environment":"[parameters('environment')]"
+            },
         },
         {
             "condition": "[equals(parameters('createAppSecGroup'),'exist')]",
@@ -144,7 +146,9 @@
                     }
                 ]
             },
-            "tags": {}
+            "tags": {
+                "Environment":"[parameters('environment')]"
+            },
         },
         {
             "name": "[parameters('vmName')]",
@@ -196,7 +200,9 @@
                     }
                 }
             },
-            "tags": {},
+            "tags": {
+                "Environment":"[parameters('environment')]"
+            },
             "resources": [
                 {
                     "type": "extensions",
