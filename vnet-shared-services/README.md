@@ -31,4 +31,4 @@ ASGs have been setup and used where possible in NSGs.  This includes ASGs for:
 * Management servers
 
 The environment is pictured below:
-![lab image](lab.visual.png)
+![lab image](lab_visual.png)
