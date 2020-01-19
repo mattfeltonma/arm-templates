@@ -3,28 +3,52 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "environment": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "Value used for Environment applied to all taggable resources"
+            }
         },
         "vmName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description":"VM Name"
+            }
         },
         "subnetName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description":"Name of subnet VM interface will be placed in"
+            }
         },
         "virtualNetworkName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description":"Name of VNet containing subnet VM interface will be placed in"
+            }
         },
         "virtualMachineSize": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description":"VM Size"
+            }
         },
         "privateIp": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description":"Private IP of network interface associated with VM"
+            }
         },
         "adminUsername": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description":"Name of the administrator account created on the VM"
+            }
         },
         "adminPassword": {
-            "type": "securestring"
+            "type": "securestring",
+            "metadata": {
+                "description":"The password for the administrator account created on the VM"
+            }
         },
         "createAppSecGroup": {
             "type":"string",
@@ -32,20 +56,42 @@
 			"allowedValues": [
                 "create",
                 "exist"
-			]
+			],
+            "metadata": {
+                "description":"Create a new Application Security Group or use an existing one"
+            }
         },
         "appSecGroup": {
-            "type":"string"
+            "type":"string",
+            "metadata": {
+                "description":"The name of the Application Security Group to create or use"
+            }
         },
         "myWorkspaceId": {
-            "type":"string"
+            "type":"string",
+            "metadata": {
+                "description":"The Log and Analytics workspace ID that the Microsoft Monitoring Agent will deliver metrics and logs to"
+            }
         },
         "myWorkspaceKey": {
-            "type":"string"
+            "type":"string",
+            "metadata": {
+                "description":"The Log and Analytics workspace secret"
+            }
         },
         "networkResourceGroup": {
             "type": "string",
-            "defaultValue": "[resourceGroup().name]"
+            "defaultValue": "[resourceGroup().name]",
+            "metadata": {
+                "description":"The name of the resource group containing the VNet the VM will be placed in"
+            }
+        },
+        "appSecResourceGroup": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().name]",
+            "metadata": {
+                "description":"The name of the resource group containing the existing Application Security Group."
+            }
         }
     },
     "variables": {
@@ -116,7 +162,7 @@
             },
             "tags": {
                 "Environment":"[parameters('environment')]"
-            },
+            }
         },
         {
             "condition": "[equals(parameters('createAppSecGroup'),'exist')]",
@@ -139,7 +185,7 @@
                             "privateIPAllocationMethod": "Static",
                             "applicationSecurityGroups":[
                                 {
-                                    "id":"[resourceId(parameters('networkResourceGroup'), 'Microsoft.Network/applicationSecurityGroups', parameters('appSecGroup'))]"
+                                    "id":"[resourceId(parameters('appSecResourceGroup'), 'Microsoft.Network/applicationSecurityGroups', parameters('appSecGroup'))]"
                                 }
                             ]
                         }
@@ -148,7 +194,7 @@
             },
             "tags": {
                 "Environment":"[parameters('environment')]"
-            },
+            }
         },
         {
             "name": "[parameters('vmName')]",

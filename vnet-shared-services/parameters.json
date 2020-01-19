@@ -1,0 +1,33 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "environment": {
+            "value":"demo"
+        },
+        "ssVnetCIDR": {
+            "value":"10.100.0.0/16"
+        },
+        "gwSubnetCIDR": {
+            "value":"10.100.0.0/24"
+        },
+        "fwSubnetCIDR": {
+            "value":"10.100.1.0/24"
+        },
+        "bastionSubnetCIDR": {
+            "value":"10.100.2.0/24"
+        },
+        "intADSubnetCIDR": {
+            "value":"10.100.3.0/24"
+        },
+        "dmzAdSubnetCIDR": {
+            "value":"10.100.4.0/24"
+        },
+        "ssSubnetCIDR": {
+            "value":"10.100.5.0/24"
+        },
+        "mgmtSubnetCIDR": {
+            "value":"10.100.6.0/24"
+        }
+    }
+}

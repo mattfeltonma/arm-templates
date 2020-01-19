@@ -1,0 +1,66 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "environment": {
+            "value":"demo"
+        },
+        "vmname": {
+            "value":"VM_NAME"
+        },
+        "subnetName": {
+            "value":"VM_SUBNET_NAME"
+        },
+        "virtualNetworkName": {
+            "value":"VM_VNET_NAME"
+        },
+        "networkResourceGroup": {
+            "value": "VNET_RESOURCE_GROUP"
+        },
+        "virtualMachineSize": {
+            "value":"VM_SIZE"
+        },
+        "privateIp": {
+            "value": "VM_STATIC_IP"
+        },
+        "adminUsername": {
+            "value":"VM_LOCAL_ADMIN_USERNAME"
+        },
+        "adminPassword": {
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/<SUBSCRIPTIONID/resourceGroups/<KEYVAULT_RG_NAME>/providers/Microsoft.KeyVault/vaults/<KEYVAULT_NAME>"
+                },
+                "secretName": "<VM_LOCAL_ADMIN_PASSWORD_SECRET_NAME",
+                "secretVersion": "<SECRET_VERSION>"
+            }
+        },
+        "createAppSecGroup": {
+            "value":"CREATE_NEW_APPSECGROUP_OR_USE_EXISTING"
+        },
+        "appSecGroup": {
+            "value": "<APPSECGROUP_NAME>"
+        },
+        "appSecResourceGroup": {
+            "value": "<EXISTING_APPSECGROUP_RESOURCE_GROUP_NAME>"
+        },
+        "myWorkspaceId": {
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/<SUBSCRIPTIONID/resourceGroups/<KEYVAULT_RG_NAME>/providers/Microsoft.KeyVault/vaults/<KEYVAULT_NAME>"
+                },
+                "secretName": "<LOG_ANALYTICS_WORKSPACE_ID>",
+                "secretVersion": "<SECRET_VERSION>"
+            }
+        },
+        "myWorkspaceKey": {
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/<SUBSCRIPTIONID/resourceGroups/<KEYVAULT_RG_NAME>/providers/Microsoft.KeyVault/vaults/<KEYVAULT_NAME>"
+                },
+                "secretName": "<LOG_ANALYTICS_WORKSPACE_SECRET>",
+                "secretVersion": "<SECRET_VERSION>"
+            }
+        }
+    }
+}
