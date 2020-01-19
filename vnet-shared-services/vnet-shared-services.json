@@ -714,6 +714,24 @@
                         }
                     },
                     {
+                        "name":"AllowHttpsSts",
+                        "properties": {
+                            "description": "Allow HTTPS traffic to AD FS",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "443",
+                            "sourceAddressPrefix": "VirtualNetwork",
+                            "destinationApplicationSecurityGroups": [
+                                {
+                                    "id": "[resourceId('Microsoft.Network/applicationSecurityGroups', variables('adfsAppSecGroupName'))]"
+                                }
+                            ],
+                            "access":"Allow",
+                            "priority": 102,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
                         "name":"AllowCrlLookup",
                         "properties": {
                             "description": "Allow CRL lookup",
