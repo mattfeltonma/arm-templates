@@ -15,7 +15,7 @@
                 "description":"Name of Vnet"
             }
         },
-        "ssVnetCIDR": {
+        "vnetCIDR": {
             "type":"string",
             "defaultValue": "10.50.0.0/16",
             "metadata": {
@@ -851,7 +851,7 @@
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
-                        "[parameters('ssVnetCIDR')]"
+                        "[parameters('vnetCIDR')]"
                     ]
                 },
                 "subnets": [

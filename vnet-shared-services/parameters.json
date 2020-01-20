@@ -3,34 +3,34 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "environment": {
-            "value":"demo"
+            "value":"<VALUE OF ENVIRONMENT TAG>"
         },
         "vnetName": {
-            "value":"vnet-onprem"
+            "value":"<NAME OF SHARED SERVICES VNET>"
         },
-        "ssVnetCIDR": {
-            "value":"10.100.0.0/16"
+        "vnetCIDR": {
+            "value":"<CIDR BLOCK RESERVED FOR SHARED SERVICE VNET>"
         },
         "gwSubnetCIDR": {
-            "value":"10.100.0.0/24"
+            "value":"<CIDR BLOCK RESERVED FOR GATEWAY SUBNET>"
         },
         "fwSubnetCIDR": {
-            "value":"10.100.1.0/24"
+            "value":"<CIDR BLOCK RESERVED FOR AZURE FIREWALL SUBNET>"
         },
         "bastionSubnetCIDR": {
-            "value":"10.100.2.0/24"
+            "value":"<CIDR BLOCK RESERVED FOR AZURE BASTION SUBNET>"
         },
         "intADSubnetCIDR": {
-            "value":"10.100.3.0/24"
+            "value":"<CIDR BLOCK RESERVED FOR INTRANET WINDOWS AD SUBNET>"
         },
         "dmzAdSubnetCIDR": {
-            "value":"10.100.4.0/24"
+            "value":"<CIDR BLOCK RESERVED FOR DMZ WINDOWS AD SUBNET>"
         },
         "ssSubnetCIDR": {
-            "value":"10.100.5.0/24"
+            "value":"<CIDR BLOCK RESERVED FOR SHARED SERVICES SUBNET>"
         },
         "mgmtSubnetCIDR": {
-            "value":"10.100.6.0/24"
+            "value":"<CIDR BLOCK RESERVED FOR MANAGEMENT SUBNET>"
         }
     }
 }
