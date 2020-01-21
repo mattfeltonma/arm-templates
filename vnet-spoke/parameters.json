@@ -17,6 +17,12 @@
         "mgmntSubnetCidr": {
             "value": "<CIDR OF MANAGEMENT SUBNET>"
         },
+        "dnsServers": {
+            "value" : [
+                "<DNS_IP_ONE>",
+                "<DNS_IP_TWO>"
+            ]
+        },
         "sharedServicesVnetName": {
             "value": "<NAME OF SHARED SERVICES VNET>"
         },

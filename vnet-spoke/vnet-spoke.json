@@ -35,6 +35,12 @@
                 "description": "CIDR of the management subnet in the shared services VNet"
             }
         },
+        "dnsServers": {
+            "type":"array",
+            "metadata": {
+                "description": "The DNS servers configured on the VNet"
+            }
+        },
         "sharedServicesVnetName": {
             "type": "string",
             "metadata": {
@@ -248,6 +254,9 @@
                     "addressPrefixes": [
                         "[parameters('vnetCIDR')]"
                     ]
+                },
+                "dhcpOptions": {
+                    "dnsServers": "[parameters('dnsServers')]"
                 },
                 "subnets": [
                     {
