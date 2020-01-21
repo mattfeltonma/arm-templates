@@ -52,7 +52,7 @@
         },
         "createAppSecGroup": {
             "type":"string",
-            "defaultValue":"new",
+            "defaultValue":"create",
 			"allowedValues": [
                 "create",
                 "exist"
