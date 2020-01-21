@@ -112,7 +112,7 @@
                     {
                         "name": "AllowRdp",
                         "properties": {
-                            "description": "Allow Rdp",
+                            "description": "Allow Rdp from Management servers",
                             "protocol": "Tcp",
                             "sourcePortRange": "*",
                             "destinationPortRange": "3389",
@@ -126,7 +126,7 @@
                     {
                         "name": "AllowHttp",
                         "properties": {
-                            "description": "Allow Http traffic from Virtual Network to web servers",
+                            "description": "Allow Http traffic from Azure Load Balancer to web servers",
                             "protocol": "Tcp",
                             "sourcePortRange": "*",
                             "destinationPortRange": "80",
@@ -140,7 +140,7 @@
                     {
                         "name": "AllowHttps",
                         "properties": {
-                            "description": "Allow Https traffic from Virtual Network to web servers",
+                            "description": "Allow Https traffic from Azure Load Balancer to web servers",
                             "protocol": "Tcp",
                             "sourcePortRange": "*",
                             "destinationPortRange": "443",
