@@ -1,0 +1,41 @@
+{
+    "$schema":"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion":"1.0.0.0",
+    "parameters": {
+        "environment": {
+            "type": "string",
+            "metadata": {
+                "description": "Value used for Environment applied to all taggable resources"
+            }
+        }
+    },
+    "variables": {
+        "location": "[resourceGroup().location]",
+        "netApiVersionNum": "2019-09-01",
+        "appSecGroupNames": [
+            "asg-pri",
+            "asg-sec",
+            "asg-app1",
+            "asg-data1",
+            "asg-app2",
+            "asg-data2"
+        ]
+    },
+    "resources" : [
+        {
+            "name": "[concat(variables('appSecGroupNames')[copyIndex()])]",
+            "type": "Microsoft.Network/applicationSecurityGroups",
+            "apiVersion": "[variables('netApiVersionNum')]",
+            "location": "[variables('location')]",
+            "tags": {
+                "environment":"[parameters('environment')]"
+            },
+            "properties": {},
+            "copy": {
+                "name": "multipleresources",
+                "count": "[length(variables('appSecGroupNames'))]"
+            }
+        }
+    ]   
+}
+  
