@@ -14,6 +14,7 @@
         "netApiVersionNum": "2019-11-01",
         "rgApiVersion": "2019-10-01",
         "hubVnetName": "vnet-hub",
+        "onPremVnetName": "vnet-onprem",
         "spokeVnetName": "vnet-spoke",
         "hubCidr": "10.10.0.0/16",
         "onpremCidr": "10.0.0.0/16",
@@ -23,6 +24,8 @@
         "hubFirewallMgmtSubnetCidr": "10.10.3.0/24",
         "hubPrimarySubnetCidr": "10.10.4.0/24",
         "hubSecondarySubnetCidr": "10.10.5.0/24",
+        "onPremGatewaySubnetCidr": "10.0.0.0/24",
+        "onPremPrimarySubnetCidr": "10.0.1.0/24",
         "spokeCidrs": [
             "10.11.0.0/16",
             "10.12.0.0/16"
@@ -45,8 +48,13 @@
         "bastionPublicIpName": "pip-bastion",
         "azFirewallPublicIpName": "pip-azfw",
         "azFirewallMgmtPublicIpName": "pip-azfwmgmt",
-        "vngPublicIpName": "pip-vng",
-        "vngName": "vng-hub",
+        "hubVngPublicIpName": "pip-hubvng",
+        "hubVngName": "vng-hub",
+        "hubVngConnName": "conn-hubtoonprem",
+        "onpremVngConnName": "conn-onpremtohub",
+        "onPremVngPublicIpName": "pip-onpremvng",
+        "onPremVngName": "vng-onprem",
+        "vngConnectionSecret": "[uniqueString(resourceGroup().id, deployment().name)]",
         "bastionName": "bstss",
         "azureFirewallName": "fwhub",
         "hubRouteTable": "rt-hub",
@@ -110,6 +118,36 @@
         },
         {
             "type": "Microsoft.Network/virtualNetworks",
+            "name": "[variables('onPremVnetName')]",
+            "apiVersion": "[variables('netApiVersionNum')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('onpremCidr')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "GatewaySubnet",
+                        "properties": {
+                            "addressPrefix": "[variables('onPremGatewaySubnetCidr')]"
+                        }
+                    },
+                    {
+                        "name": "[variables('primarySubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[variables('onPremPrimarySubnetCidr')]"
+                        }
+                    }
+                ],
+                "enableDdosProtection": false
+            },
+            "resources": [
+            ]
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks",
             "name": "[concat(variables('spokeVnetName'),copyIndex(1))]",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
@@ -143,7 +181,7 @@
             ]
         },
         {
-            "name": "[variables('vngPublicIpName')]",
+            "name": "[variables('hubVngPublicIpName')]",
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
@@ -158,12 +196,12 @@
             }
         },
         {
-            "name": "[variables('vngName')]",
+            "name": "[variables('hubVngName')]",
             "type": "Microsoft.Network/virtualNetworkGateways",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/', variables('vngPublicIpName'))]",
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('hubVngPublicIpName'))]",
                 "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]"
             ],
             "properties": {
@@ -177,7 +215,7 @@
                                 "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), 'GatewaySubnet')]"
                             },
                             "publicIpAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('vngPublicIpName'))]"
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('hubVngPublicIpName'))]"
                             }
                         }
                     }
@@ -188,6 +226,109 @@
                     "name": "VpnGw2",
                     "tier": "VpnGw2"
                 }
+            }
+        },
+        {
+            "name": "[variables('onPremVngPublicIpName')]",
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "[variables('netApiVersionNum')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "publicIpAllocationMethod": "Dynamic"
+            },
+            "sku": {
+                "name": "Basic"
+            },
+            "tags": {
+                "Environment": "[parameters('environment')]"
+            }
+        },
+        {
+            "name": "[variables('onPremVngName')]",
+            "type": "Microsoft.Network/virtualNetworkGateways",
+            "apiVersion": "[variables('netApiVersionNum')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('onPremVngPublicIpName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', variables('onPremVnetName'))]"
+            ],
+            "properties": {
+                "gatewayType": "vpn",
+                "ipConfigurations": [
+                    {
+                        "name": "default",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('onPremVngName'), 'GatewaySubnet')]"
+                            },
+                            "publicIpAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('onPremVngPublicIpName'))]"
+                            }
+                        }
+                    }
+                ],
+                "vpnType": "RouteBased",
+                "vpnGatewayGeneration": "Generation2",
+                "sku": {
+                    "name": "VpnGw2",
+                    "tier": "VpnGw2"
+                }
+            }
+        },
+        {
+            "name": "[variables('hubVngConnName')]",
+            "type": "Microsoft.Network/connections",
+            "apiVersion": "[variables('netApiVersionNum')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworkGateways/', variables('hubVngName'))]",
+                "[concat('Microsoft.Network/virtualNetworkGateways/', variables('onPremVngName'))]"
+            ],
+            "properties": {
+                "virtualNetworkGateway1": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways/', variables('hubVngName'))]"
+                },
+                "virtualNetworkGateway2": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways/', variables('onPremVngName'))]"
+                },
+                "connectionType": "Vnet2Vnet",
+                "connectionProtocol": "IKEv2",
+                "routingWeight": 0,
+                "sharedKey": "[variables('vngConnectionSecret')]",
+                "enableBgp": false,
+                "useLocalAzureIpAddress": false,
+                "usePolicyBasedTrafficSelectors": false,
+                "ipsecPolicies": [],
+                "trafficSelectorPolicies": []
+            }
+        },
+        {
+            "name": "[variables('onpremVngConnName')]",
+            "type": "Microsoft.Network/connections",
+            "apiVersion": "[variables('netApiVersionNum')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworkGateways/', variables('hubVngName'))]",
+                "[concat('Microsoft.Network/virtualNetworkGateways/', variables('onPremVngName'))]"
+            ],
+            "properties": {
+                "virtualNetworkGateway1": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways/', variables('onPremVngName'))]"
+
+                },
+                "virtualNetworkGateway2": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways/', variables('hubVngName'))]"
+                },
+                "connectionType": "Vnet2Vnet",
+                "connectionProtocol": "IKEv2",
+                "routingWeight": 0,
+                "sharedKey": "[variables('vngConnectionSecret')]",
+                "enableBgp": false,
+                "useLocalAzureIpAddress": false,
+                "usePolicyBasedTrafficSelectors": false,
+                "ipsecPolicies": [],
+                "trafficSelectorPolicies": []
             }
         },
         {
@@ -377,8 +518,7 @@
                 ],
                 "disableBgpRoutePropagation": "False"
             },
-            "resources": [
-            ]
+            "resources": []
         },
         {
             "name": "[concat(variables('hubRouteTable'),'/','udr-spoke',copyIndex(1))]",
@@ -445,8 +585,7 @@
                 ],
                 "disableBgpRoutePropagation": "True"
             },
-            "resources": [
-            ]
+            "resources": []
         }
     ]
 }
