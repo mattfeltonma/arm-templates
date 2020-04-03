@@ -339,7 +339,7 @@
             "dependsOn": [
                 "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]",
                 "[concat('Microsoft.Network/virtualNetworks/', variables('spokeVnetName'),copyIndex(1))]",
-                "[concat('Microsoft.Network/virtualNetworkGateways/', variables('vngName'))]"
+                "[concat('Microsoft.Network/virtualNetworkGateways/', variables('hubVngName'))]"
             ],
             "properties": {
                 "allowVirtualNetworkAccess": "true",
@@ -362,7 +362,7 @@
             "dependsOn": [
                 "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]",
                 "[concat('Microsoft.Network/virtualNetworks/', variables('spokeVnetName'),copyIndex(1))]",
-                "[concat('Microsoft.Network/virtualNetworkGateways/', variables('vngName'))]"
+                "[concat('Microsoft.Network/virtualNetworkGateways/', variables('hubVngName'))]"
             ],
             "properties": {
                 "allowVirtualNetworkAccess": "true",
