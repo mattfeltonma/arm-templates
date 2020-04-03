@@ -384,6 +384,10 @@
             "name": "[concat(variables('hubRouteTable'),'/','udr-spoke',copyIndex(1))]",
             "type": "Microsoft.Network/routeTables/routes",
             "apiVersion": "[variables('netApiVersionNum')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/routeTables/', variables('hubRouteTable'))]"
+            ],
             "properties": {
                 "addressPrefix": "[variables('spokeCidrs')[copyIndex()]]",
                 "nextHopType": "VirtualAppliance",
@@ -398,6 +402,10 @@
             "name": "[concat(variables('hubVNGRouteTable'),'/','udr-spoke',copyIndex(1))]",
             "type": "Microsoft.Network/routeTables/routes",
             "apiVersion": "[variables('netApiVersionNum')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/routeTables/', variables('hubVNGRouteTable'))]"
+            ],            
             "properties": {
                 "addressPrefix": "[variables('spokeCidrs')[copyIndex()]]",
                 "nextHopType": "VirtualAppliance",
