@@ -16,6 +16,7 @@
         "hubVnetName": "vnet-hub",
         "spokeVnetName": "vnet-spoke",
         "hubCidr": "10.10.0.0/16",
+        "onpremCidr": "10.0.0.0/16",
         "hubGatewaySubnetCidr": "10.10.0.0/24",
         "hubBastionSubnetCidr": "10.10.1.0/24",
         "hubFirewallSubnetCidr": "10.10.2.0/24",
@@ -47,7 +48,10 @@
         "vngPublicIpName": "pip-vng",
         "vngName": "vng-hub",
         "bastionName": "bstss",
-        "azureFirewallName": "fwhub"
+        "azureFirewallName": "fwhub",
+        "hubRouteTable": "rt-hub",
+        "hubVNGRouteTable": "rt-vng-hub",
+        "spokeRouteTable": "rt-spoke"
     },
     "resources": [
         {
@@ -133,7 +137,7 @@
             },
             "copy": {
                 "name":"spokevnets",
-                "count": 2
+                "count": "[length(variables('spokeCidrs'))]"
             },
             "resources": [
             ]
@@ -206,7 +210,7 @@
             },
             "copy": {
                 "name": "copyhubpeerings",
-                "count": 2
+                "count": "[length(variables('spokeCidrs'))]"
             }
         },
         {
@@ -230,7 +234,7 @@
             },
             "copy": {
                 "name": "copyspokepeerings",
-                "count": 2
+                "count": "[length(variables('spokeCidrs'))]"
             }
         },
         {
@@ -299,6 +303,128 @@
                     "contentVersion": "1.0.0.0"
                 }
             }
+        },
+        {
+            "name": "[variables('hubVNGRouteTable')]",
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "[variables('netApiVersionNum')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/fw-hub')]"
+            ],
+            "properties": {
+                "routes": [
+                    {
+                        "name": "udr-hub",
+                        "properties": {
+                            "addressPrefix": "[variables('hubCidr')]",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "[reference('fw-hub').outputs.fwPrivateIP.value]"
+                        }
+                    }
+                ],
+                "disableBgpRoutePropagation": "False"
+            },
+            "resources": [
+                {
+                    "name": "[concat('udr-spoke',copyIndex(1))]",
+                    "type": "routes",
+                    "apiVersion": "[variables('netApiVersionNum')]",
+                    "properties": {
+                        "addressPrefix": "[variables('spokeCidrs')[copyIndex()]]",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[reference('fw-hub').outputs.fwPrivateIP.value]"
+                    },
+                    "copy": {
+                        "name": "copyvngudrroutes",
+                        "count": "[length(variables('spokeCidrs'))]"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "[variables('hubRouteTable')]",
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "[variables('netApiVersionNum')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/fw-hub')]"
+            ],
+            "properties": {
+                "routes": [
+                    {
+                        "name": "udr-bastion",
+                        "properties": {
+                            "addressPrefix": "[variables('hubBastionSubnetCidr')]",
+                            "nextHopType": "VnetLocal"
+                        }
+                    },
+                    {
+                        "name": "udr-hub",
+                        "properties": {
+                            "addressPrefix": "[variables('hubCidr')]",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "[reference('fw-hub').outputs.fwPrivateIP.value]"
+                        }
+                    },
+                    {
+                        "name": "udr-onprem",
+                        "properties": {
+                            "addressPrefix": "[variables('onpremCidr')]",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "[reference('fw-hub').outputs.fwPrivateIP.value]"
+                        }
+                    }
+                ],
+                "disableBgpRoutePropagation": "False"
+            },
+            "resources": [
+                {
+                    "name": "[concat('udr-spoke',copyIndex(1))]",
+                    "type": "routes",
+                    "apiVersion": "[variables('netApiVersionNum')]",
+                    "properties": {
+                        "addressPrefix": "[variables('spokeCidrs')[copyIndex()]]",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "[reference('fw-hub').outputs.fwPrivateIP.value]"
+                    },
+                    "copy": {
+                        "name": "copyhubroutes",
+                        "count": "[length(variables('spokeCidrs'))]"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "[variables('spokeRouteTable')]",
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "[variables('netApiVersionNum')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/fw-hub')]"
+            ],
+            "properties": {
+                "routes": [
+                    {
+                        "name": "udr-default",
+                        "properties": {
+                            "addressPrefix": "0.0.0.0/0",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "[reference('fw-hub').outputs.fwPrivateIP.value]"
+                        }
+                    },
+                    {
+                        "name": "udr-hub",
+                        "properties": {
+                            "addressPrefix": "[variables('hubCidr')]",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "[reference('fw-hub').outputs.fwPrivateIP.value]"
+                        }
+                    }
+                ],
+                "disableBgpRoutePropagation": "True"
+            },
+            "resources": []
         }
     ]
 }

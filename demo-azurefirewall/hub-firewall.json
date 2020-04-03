@@ -85,11 +85,11 @@
                 "[concat('Microsoft.Network/publicIpAddresses/', parameters('azFirewallPublicIP'))]",
                 "[concat('Microsoft.Network/publicIpAddresses/', parameters('azFirewallMgmtPublicIP'))]"
             ],
+            "zones": [
+                "1",
+                "2"
+            ],
             "properties": {
-                "zones": [
-                    "1",
-                    "2"
-                ],
                 "ipConfigurations": [
                     {
                         "name": "ipconfig1",
@@ -98,7 +98,7 @@
                                 "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('hubVnetName'), 'AzureFirewallSubnet')]"
                             },
                             "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIpAddresses', parameters('azFirewallMgmtPublicIP'))]"
+                                "id": "[resourceId('Microsoft.Network/publicIpAddresses', parameters('azFirewallPublicIP'))]"
                             }
                         }
                     }
@@ -121,5 +121,11 @@
                 }
             }
         }
-    ]
+    ],
+    "outputs": {
+        "fwPrivateIP": {
+            "type": "string",
+            "value": "[reference(parameters('fwHubName')).ipConfigurations[0].properties.privateIPAddress]"
+        }
+    }
 }
