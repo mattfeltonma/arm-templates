@@ -299,7 +299,7 @@
                     "azFirewallMgmtPublicIP": "[variables('azFirewallMgmtPublicIpName')]"
                 },
                 "templateLink": {
-                    "uri": "https://github.com/mattfeltonma/arm-templates/hub-firewall.json",
+                    "uri": "https://github.com/mattfeltonma/arm-templates/blob/master/demo-azurefirewall/hub-firewall.json",
                     "contentVersion": "1.0.0.0"
                 }
             }
