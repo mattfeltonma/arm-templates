@@ -136,7 +136,7 @@
                 "enableDdosProtection": false
             },
             "copy": {
-                "name":"spokevnets",
+                "name": "spokevnets",
                 "count": "[length(variables('spokeCidrs'))]"
             },
             "resources": [
@@ -249,7 +249,7 @@
                 "name": "Standard"
             },
             "tags": {
-                "Environment":"[parameters('environment')]"
+                "Environment": "[parameters('environment')]"
             }
         },
         {
@@ -262,7 +262,7 @@
                 "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]"
             ],
             "tags": {
-                "Environment":"[parameters('environment')]"
+                "Environment": "[parameters('environment')]"
             },
             "properties": {
                 "ipConfigurations": [
@@ -277,7 +277,7 @@
                             },
                             "privateIPAllocationMethod": "Dynamic"
                         }
-                    }   
+                    }
                 ]
             }
         },
@@ -291,15 +291,28 @@
             "properties": {
                 "mode": "Incremental",
                 "parameters": {
-                    "environment": "[parameters('environment')]",
-                    "hubVnetName": "[variables('hubVnetName')]",
-                    "netApiVersion": "[variables('netApiVersionNum')]",
-                    "fwHubName": "[variables('azureFirewallName')]",
-                    "azFirewallPublicIP": "[variables('azFirewallPublicIpName')]",
-                    "azFirewallMgmtPublicIP": "[variables('azFirewallMgmtPublicIpName')]"
+                    "environment": {
+                        "value": "[parameters('environment')]"
+                    },
+                    "hubVnetName": {
+                        "value": "[variables('hubVnetName')]"
+                    },
+                    "netApiVersion": {
+                        "value": "[variables('netApiVersionNum')]"
+                    },
+                    "fwHubName": {
+                        "value": "[variables('azureFirewallName')]"
+                    },
+                    "azFirewallPublicIP": {
+                        "value": "[variables('azFirewallPublicIpName')]"
+                    },
+                    "azFirewallMgmtPublicIP": 
+                    {
+                        "value": "[variables('azFirewallMgmtPublicIpName')]"
+                    }
                 },
                 "templateLink": {
-                    "uri": "https://github.com/mattfeltonma/arm-templates/blob/master/demo-azurefirewall/hub-firewall.json",
+                    "uri": "https://raw.githubusercontent.com/mattfeltonma/arm-templates/master/demo-azurefirewall/hub-firewall.json",
                     "contentVersion": "1.0.0.0"
                 }
             }
@@ -326,20 +339,6 @@
                 "disableBgpRoutePropagation": "False"
             },
             "resources": [
-                {
-                    "name": "[concat('udr-spoke',copyIndex(1))]",
-                    "type": "routes",
-                    "apiVersion": "[variables('netApiVersionNum')]",
-                    "properties": {
-                        "addressPrefix": "[variables('spokeCidrs')[copyIndex()]]",
-                        "nextHopType": "VirtualAppliance",
-                        "nextHopIpAddress": "[reference('fw-hub').outputs.fwPrivateIP.value]"
-                    },
-                    "copy": {
-                        "name": "copyvngudrroutes",
-                        "count": "[length(variables('spokeCidrs'))]"
-                    }
-                }
             ]
         },
         {
@@ -379,21 +378,35 @@
                 "disableBgpRoutePropagation": "False"
             },
             "resources": [
-                {
-                    "name": "[concat('udr-spoke',copyIndex(1))]",
-                    "type": "routes",
-                    "apiVersion": "[variables('netApiVersionNum')]",
-                    "properties": {
-                        "addressPrefix": "[variables('spokeCidrs')[copyIndex()]]",
-                        "nextHopType": "VirtualAppliance",
-                        "nextHopIpAddress": "[reference('fw-hub').outputs.fwPrivateIP.value]"
-                    },
-                    "copy": {
-                        "name": "copyhubroutes",
-                        "count": "[length(variables('spokeCidrs'))]"
-                    }
-                }
             ]
+        },
+        {
+            "name": "[concat(variables('hubRouteTable'),'/','udr-spoke',copyIndex(1))]",
+            "type": "Microsoft.Network/routeTables/routes",
+            "apiVersion": "[variables('netApiVersionNum')]",
+            "properties": {
+                "addressPrefix": "[variables('spokeCidrs')[copyIndex()]]",
+                "nextHopType": "VirtualAppliance",
+                "nextHopIpAddress": "[reference('fw-hub').outputs.fwPrivateIP.value]"
+            },
+            "copy": {
+                "name": "copyspokerouteshub",
+                "count": "[length(variables('spokeCidrs'))]"
+            }
+        },
+        {
+            "name": "[concat(variables('hubVNGRouteTable'),'/','udr-spoke',copyIndex(1))]",
+            "type": "Microsoft.Network/routeTables/routes",
+            "apiVersion": "[variables('netApiVersionNum')]",
+            "properties": {
+                "addressPrefix": "[variables('spokeCidrs')[copyIndex()]]",
+                "nextHopType": "VirtualAppliance",
+                "nextHopIpAddress": "[reference('fw-hub').outputs.fwPrivateIP.value]"
+            },
+            "copy": {
+                "name": "copyspokeroutesvng",
+                "count": "[length(variables('spokeCidrs'))]"
+            }
         },
         {
             "name": "[variables('spokeRouteTable')]",
@@ -424,7 +437,8 @@
                 ],
                 "disableBgpRoutePropagation": "True"
             },
-            "resources": []
+            "resources": [
+            ]
         }
     ]
 }
