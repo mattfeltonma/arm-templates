@@ -13,6 +13,9 @@
         "location": "[resourceGroup().location]",
         "netApiVersionNum": "2019-11-01",
         "rgApiVersion": "2019-10-01",
+        "laApiVersion": "2015-11-01-preview",
+        "diagApiVersion": "2017-05-01-preview",
+        "laWorkspaceName": "la-primary",
         "hubVnetName": "vnet-hub",
         "onPremVnetName": "vnet-onprem",
         "spokeVnetName": "vnet-spoke",
@@ -62,6 +65,20 @@
         "spokeRouteTable": "rt-spoke"
     },
     "resources": [
+        {
+            "name": "[variables('laWorkspaceName')]",
+            "type": "Microsoft.OperationalInsights/workspaces",
+            "apiVersion": "[variables('laApiVersion')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "sku": {
+                    "name": "PerGB2018"
+                },
+                "retentionInDays": "30"
+            },
+            "resources": [
+            ]
+        },
         {
             "type": "Microsoft.Network/virtualNetworks",
             "name": "[variables('hubVnetName')]",
@@ -299,8 +316,10 @@
                 "enableBgp": false,
                 "useLocalAzureIpAddress": false,
                 "usePolicyBasedTrafficSelectors": false,
-                "ipsecPolicies": [],
-                "trafficSelectorPolicies": []
+                "ipsecPolicies": [
+                ],
+                "trafficSelectorPolicies": [
+                ]
             }
         },
         {
@@ -327,8 +346,10 @@
                 "enableBgp": false,
                 "useLocalAzureIpAddress": false,
                 "usePolicyBasedTrafficSelectors": false,
-                "ipsecPolicies": [],
-                "trafficSelectorPolicies": []
+                "ipsecPolicies": [
+                ],
+                "trafficSelectorPolicies": [
+                ]
             }
         },
         {
@@ -423,40 +444,109 @@
             }
         },
         {
-            "name": "fw-hub",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "[variables('rgApiVersion')]",
+            "name": "[variables('azFirewallPublicIpName')]",
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "[variables('netApiVersionNum')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "publicIpAllocationMethod": "Static"
+            },
+            "sku": {
+                "name": "Standard"
+            },
+            "tags": {
+                "Environment": "[parameters('environment')]"
+            }
+        },
+        {
+            "name": "[variables('azFirewallMgmtPublicIpName')]",
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "[variables('netApiVersionNum')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "publicIpAllocationMethod": "Static"
+            },
+            "sku": {
+                "name": "Standard"
+            },
+            "tags": {
+                "Environment": "[parameters('environment')]"
+            }
+        },
+        {
+            "name": "[variables('azureFirewallName')]",
+            "type": "Microsoft.Network/azureFirewalls",
+            "apiVersion": "[variables('netApiVersionNum')]",
+            "location": "[variables('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]"
+                "[concat('Microsoft.Network/publicIpAddresses/', variables('azFirewallPublicIpName'))]",
+                "[concat('Microsoft.Network/publicIpAddresses/', variables('azFirewallMgmtPublicIpName'))]"
+            ],
+            "zones": [
+                "1"
             ],
             "properties": {
-                "mode": "Incremental",
-                "parameters": {
-                    "environment": {
-                        "value": "[parameters('environment')]"
-                    },
-                    "hubVnetName": {
-                        "value": "[variables('hubVnetName')]"
-                    },
-                    "netApiVersion": {
-                        "value": "[variables('netApiVersionNum')]"
-                    },
-                    "fwHubName": {
-                        "value": "[variables('azureFirewallName')]"
-                    },
-                    "azFirewallPublicIP": {
-                        "value": "[variables('azFirewallPublicIpName')]"
-                    },
-                    "azFirewallMgmtPublicIP": 
+                "ipConfigurations": [
                     {
-                        "value": "[variables('azFirewallMgmtPublicIpName')]"
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), 'AzureFirewallSubnet')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIpAddresses', variables('azFirewallPublicIpName'))]"
+                            }
+                        }
+                    }
+                ],
+                "managementIpConfiguration": {
+                    "name": "mgmtipconfig",
+                    "properties": {
+                        "subnet": {
+                            "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), 'AzureFirewallManagementSubnet')]"
+                        },
+                        "publicIPAddress": {
+                            "id": "[resourceId('Microsoft.Network/publicIpAddresses', variables('azFirewallMgmtPublicIpName'))]"
+                        }
                     }
                 },
-                "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/mattfeltonma/arm-templates/master/demo-azurefirewall/hub-firewall.json",
-                    "contentVersion": "1.0.0.0"
+                "threatIntelMode": "Alert",
+                "sku": {
+                    "name": "AZFW_VNet",
+                    "tier": "Standard"
                 }
             }
+        },
+        {
+            "name": "[concat(variables('azureFirewallName'),'/microsoft.insights/diag')]",
+            "type": "Microsoft.Network/azureFirewalls/providers/diagnosticSettings",
+            "apiVersion": "[variables('diagApiVersion')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/azureFirewalls/',variables('azureFirewallName'))]"
+            ],
+            "properties": {
+                "name": "sendToWorkspace",
+                "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName'))]",
+                "logs": [
+                    {
+                        "category": "AzureFirewallApplicationRule",
+                        "enabled": true
+                    },
+                    {
+                        "category": "AzureFirewallNetworkRule",
+                        "enabled": true
+                    }
+                ],
+                "metrics": [
+                    {
+                        "category": "AllMetrics",
+                        "enabled": true
+                    }
+                ]
+            },
+            "resources": [
+            ]
         },
         {
             "name": "[variables('hubVNGRouteTable')]",
@@ -464,7 +554,7 @@
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/fw-hub')]"
+                "[concat('Microsoft.Network/azureFirewalls/',variables('azureFirewallName'))]"
             ],
             "properties": {
                 "routes": [
@@ -473,7 +563,7 @@
                         "properties": {
                             "addressPrefix": "[variables('hubCidr')]",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "[reference('fw-hub').outputs.fwPrivateIP.value]"
+                            "nextHopIpAddress": "[reference(variables('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }
                     }
                 ],
@@ -488,7 +578,7 @@
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/fw-hub')]"
+                "[concat('Microsoft.Network/azureFirewalls/',variables('azureFirewallName'))]"
             ],
             "properties": {
                 "routes": [
@@ -504,7 +594,7 @@
                         "properties": {
                             "addressPrefix": "[variables('hubCidr')]",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "[reference('fw-hub').outputs.fwPrivateIP.value]"
+                            "nextHopIpAddress": "[reference(variables('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }
                     },
                     {
@@ -512,13 +602,14 @@
                         "properties": {
                             "addressPrefix": "[variables('onpremCidr')]",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "[reference('fw-hub').outputs.fwPrivateIP.value]"
+                            "nextHopIpAddress": "[reference(variables('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }
                     }
                 ],
                 "disableBgpRoutePropagation": "False"
             },
-            "resources": []
+            "resources": [
+            ]
         },
         {
             "name": "[concat(variables('hubRouteTable'),'/','udr-spoke',copyIndex(1))]",
@@ -531,7 +622,7 @@
             "properties": {
                 "addressPrefix": "[variables('spokeCidrs')[copyIndex()]]",
                 "nextHopType": "VirtualAppliance",
-                "nextHopIpAddress": "[reference('fw-hub').outputs.fwPrivateIP.value]"
+                "nextHopIpAddress": "[reference(variables('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
             },
             "copy": {
                 "name": "copyspokerouteshub",
@@ -545,11 +636,11 @@
             "location": "[variables('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/routeTables/', variables('hubVNGRouteTable'))]"
-            ],            
+            ],
             "properties": {
                 "addressPrefix": "[variables('spokeCidrs')[copyIndex()]]",
                 "nextHopType": "VirtualAppliance",
-                "nextHopIpAddress": "[reference('fw-hub').outputs.fwPrivateIP.value]"
+                "nextHopIpAddress": "[reference(variables('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
             },
             "copy": {
                 "name": "copyspokeroutesvng",
@@ -562,7 +653,7 @@
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/fw-hub')]"
+                "[concat('Microsoft.Network/azureFirewalls/',variables('azureFirewallName'))]"
             ],
             "properties": {
                 "routes": [
@@ -571,7 +662,7 @@
                         "properties": {
                             "addressPrefix": "0.0.0.0/0",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "[reference('fw-hub').outputs.fwPrivateIP.value]"
+                            "nextHopIpAddress": "[reference(variables('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }
                     },
                     {
@@ -579,13 +670,14 @@
                         "properties": {
                             "addressPrefix": "[variables('hubCidr')]",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "[reference('fw-hub').outputs.fwPrivateIP.value]"
+                            "nextHopIpAddress": "[reference(variables('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }
                     }
                 ],
                 "disableBgpRoutePropagation": "True"
             },
-            "resources": []
+            "resources": [
+            ]
         }
     ]
 }

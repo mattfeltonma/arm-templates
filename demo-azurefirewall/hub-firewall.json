@@ -86,8 +86,7 @@
                 "[concat('Microsoft.Network/publicIpAddresses/', parameters('azFirewallMgmtPublicIP'))]"
             ],
             "zones": [
-                "1",
-                "2"
+                "1"
             ],
             "properties": {
                 "ipConfigurations": [
