@@ -57,7 +57,7 @@
         "onPremVngPublicIpName": "pip-onpremvng",
         "onPremVngName": "vng-onprem",
         "vngConnectionSecret": "[uniqueString(resourceGroup().id, deployment().name)]",
-        "laWorkspaceName": "[concat('la-',variables('vngConnectionSecret'))]",
+        "laWorkspaceName": "[concat('la-',uniqueString(resourceGroup().id))]",
         "bastionName": "bstss",
         "azureFirewallName": "fwhub",
         "hubRouteTable": "rt-hub",
@@ -526,7 +526,7 @@
                 "[concat('Microsoft.Network/azureFirewalls/',variables('azureFirewallName'))]"
             ],
             "properties": {
-                "name": "sendToWorkspace",
+                "name": "SendToWorkspace",
                 "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName'))]",
                 "logs": [
                     {
