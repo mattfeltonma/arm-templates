@@ -7,12 +7,24 @@
             "metadata": {
                 "description": "Value used for Environment applied to all taggable resources"
             }
+        },
+        "vmAdminUsername": {
+            "type": "string",
+            "metadata": {
+                "description": "Administrator name for VMs that are created"              
+            }
+        },
+        "vmAdminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Password for the VMs that are created"              
+            }
         }
     },
     "variables": {
         "location": "[resourceGroup().location]",
         "netApiVersionNum": "2019-11-01",
-        "rgApiVersion": "2019-10-01",
+        "resourceDeploymentsApiVersion": "2019-10-01",
         "laApiVersion": "2015-11-01-preview",
         "diagApiVersion": "2017-05-01-preview",
         "hubVnetName": "vnet-hub",
@@ -62,7 +74,8 @@
         "azureFirewallName": "fwhub",
         "hubRouteTable": "rt-hub",
         "hubVNGRouteTable": "rt-vng-hub",
-        "spokeRouteTable": "rt-spoke"
+        "spokeRouteTable": "rt-spoke",
+        "vmSize": "Standard_DS2_v2"
     },
     "resources": [
         {
@@ -486,6 +499,126 @@
                 "1"
             ],
             "properties": {
+                "networkRuleCollections": [
+                    {
+                        "name": "RdpRc1",
+                        "properties": {
+                            "priority": 100,
+                            "action": {
+                                "type": "Allow"
+                            },
+                            "rules": [
+                                {
+                                    "name": "RdpIntraSubnet",
+                                    "protocols": [
+                                        "TCP"
+                                    ],
+                                    "sourceAddresses": [
+                                        "[variables('hubSecondarySubnetCidr')]"
+                                    ],
+                                    "destinationAddresses": [
+                                        "[variables('hubSecondarySubnetCidr')]"
+                                    ],
+                                    "destinationPorts": [
+                                        "3389"
+                                    ]
+                                },
+                                {
+                                    "name": "RdpIntraVNet",
+                                    "protocols": [
+                                        "TCP"
+                                    ],
+                                    "sourceAddresses": [
+                                        "[variables('hubPrimarySubnetCidr')]"                                        
+                                    ],
+                                    "destinationAddresses": [
+                                        "[variables('hubSecondarySubnetCidr')]"
+                                    ],
+                                    "destinationPorts": [
+                                        "3389"
+                                    ]
+                                },
+                                {
+                                    "name": "RdpInterVNet",
+                                    "protocols": [
+                                        "TCP"
+                                    ],
+                                    "sourceAddresses": [
+                                        "[variables('hubPrimarySubnetCidr')]"                                        
+                                    ],
+                                    "destinationAddresses": [
+                                        "[variables('appSubnetCidrs')[0]]",
+                                        "[variables('appSubnetCidrs')[1]]"
+                                    ],
+                                    "destinationPorts": [
+                                        "3389"
+                                    ]
+                                },
+                                {
+                                    "name": "RdpIntraSpoke",
+                                    "protocols": [
+                                        "TCP"
+                                    ],
+                                    "sourceAddresses": [
+                                        "[variables('appSubnetCidrs')[0]]"                                        
+                                    ],
+                                    "destinationAddresses": [
+                                        "[variables('dataSubnetCidrs')[0]]"
+                                    ],
+                                    "destinationPorts": [
+                                        "3389"
+                                    ]
+                                },
+                                {
+                                    "name": "RdpInterSpoke",
+                                    "protocols": [
+                                        "TCP"
+                                    ],
+                                    "sourceAddresses": [
+                                        "[variables('appSubnetCidrs')[0]]"                                        
+                                    ],
+                                    "destinationAddresses": [
+                                        "[variables('appSubnetCidrs')[1]]"
+                                    ],
+                                    "destinationPorts": [
+                                        "3389"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "applicationRuleCollections": [
+                    {
+                        "name": "Web",
+                        "properties": {
+                            "priority": 100,
+                            "action": {
+                                "type": "Allow"
+                            },
+                            "rules": [
+                                {
+                                    "name": "AllowCNN",
+                                    "description": "Allow access to CNN",
+                                    "sourceAddresses": [
+                                        "[variables('hubCidr')]",
+                                        "[variables('appSubnetCidrs')[0]]",
+                                        "[variables('appSubnetCidrs')[1]]"
+                                    ],
+                                    "protocols": [
+                                        {
+                                            "protocolType": "TCP",
+                                            "port": "3389"
+                                        }
+                                    ],
+                                    "targetFqdns": [
+                                        "cnn.com"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ],
                 "ipConfigurations": [
                     {
                         "name": "ipconfig1",
@@ -678,6 +811,133 @@
             },
             "resources": [
             ]
-        }
+        },
+        {
+            "name": "vm-hub-prim",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]",
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {
+                    "environment": {
+                        "value": "[parameters('environment')]"
+                    },
+                    "vmName": {
+                        "value": "vm-hub-prim"
+                    },
+                    "subnetRef": {
+                        "value": "[concat(resourceId('Microsoft.Network/virtualNetworks', variables('hubVnetName')),'/subnets/',variables('primarySubnetName'))]"
+                    },
+                    "virtualMachineSize": {
+                        "value": "[variables('vmSize')]"
+                    },
+                    "adminUserName": {
+                        "value": "[parameters('vmAdminUsername')]"
+                    },
+                    "workspaceId":
+                    {
+                        "value": "[resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName'))]"
+                    },
+                    "workspaceSecret":
+                    {
+                        "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-11-01-preview').primarySharedKey]"
+                    }
+                },
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/mattfeltonma/arm-templates/blob/master/vm-win-2016/vm-win-2016.json",
+                    "contentVersion": "1.0.0.0"
+                }
+            }
+        },
+        {
+            "name": "vm-onprem-hub",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', variables('onPremVnetName'))]",
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {
+                    "environment": {
+                        "value": "[parameters('environment')]"
+                    },
+                    "vmName": {
+                        "value": "vm-onprem-pri"
+                    },
+                    "subnetRef": {
+                        "value": "[concat(resourceId('Microsoft.Network/virtualNetworks', variables('onPremVnetName'),'/subnets/',variables('primarySubnetName'))]"
+                    },
+                    "virtualMachineSize": {
+                        "value": "[variables('vmSize')]"
+                    },
+                    "adminUserName": {
+                        "value": "[parameters('vmAdminUsername')]"
+                    },
+                    "workspaceId":
+                    {
+                        "value": "[resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName'))]"
+                    },
+                    "workspaceSecret":
+                    {
+                        "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-11-01-preview').primarySharedKey]"
+                    }
+                },
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/mattfeltonma/arm-templates/blob/master/vm-win-2016/vm-win-2016.json",
+                    "contentVersion": "1.0.0.0"
+                }
+            }
+        },
+        {
+            "name": "[concat('vm-spoke-app',copyIndex(1))]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', variables('spokeVnetName'), copyIndex(1))]",
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {
+                    "environment": {
+                        "value": "[parameters('environment')]"
+                    },
+                    "vmName": {
+                        "value": "[concat('vm-spoke',copyIndex(1),'-app')]"
+                    },
+                    "subnetRef": {
+                        "value": "[concat(resourceId('Microsoft.Network/virtualNetworks', concat(variables('spokeVnetName'),copyIndex(1))),'/subnets/',variables('appSubnetName'))]"
+                    },
+                    "virtualMachineSize": {
+                        "value": "[variables('vmSize')]"
+                    },
+                    "adminUserName": {
+                        "value": "[parameters('vmAdminUsername')]"
+                    },
+                    "workspaceId":
+                    {
+                        "value": "[resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName'))]"
+                    },
+                    "workspaceSecret":
+                    {
+                        "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-11-01-preview').primarySharedKey]"
+                    }
+                },
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/mattfeltonma/arm-templates/blob/master/vm-win-2016/vm-win-2016.json",
+                    "contentVersion": "1.0.0.0"
+                }
+            },
+            "copy": {
+                "name": "vmspokeapp",
+                "count": 2
+            }
+        },
     ]
 }

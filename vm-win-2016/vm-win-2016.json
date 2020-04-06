@@ -14,28 +14,16 @@
                 "description":"VM Name"
             }
         },
-        "subnetName": {
+        "subnetRef": {
             "type": "string",
             "metadata": {
-                "description":"Name of subnet VM interface will be placed in"
-            }
-        },
-        "virtualNetworkName": {
-            "type": "string",
-            "metadata": {
-                "description":"Name of VNet containing subnet VM interface will be placed in"
+                "description":"Subnet reference for the VM's NIC"
             }
         },
         "virtualMachineSize": {
             "type": "string",
             "metadata": {
                 "description":"VM Size"
-            }
-        },
-        "privateIp": {
-            "type": "string",
-            "metadata": {
-                "description":"Private IP of network interface associated with VM"
             }
         },
         "adminUsername": {
@@ -50,23 +38,6 @@
                 "description":"The password for the administrator account created on the VM"
             }
         },
-        "createAppSecGroup": {
-            "type":"string",
-            "defaultValue":"create",
-			"allowedValues": [
-                "create",
-                "exist"
-			],
-            "metadata": {
-                "description":"Create a new Application Security Group or use an existing one"
-            }
-        },
-        "appSecGroup": {
-            "type":"string",
-            "metadata": {
-                "description":"The name of the Application Security Group to create or use"
-            }
-        },
         "myWorkspaceId": {
             "type":"string",
             "metadata": {
@@ -77,20 +48,6 @@
             "type":"string",
             "metadata": {
                 "description":"The Log and Analytics workspace secret"
-            }
-        },
-        "networkResourceGroup": {
-            "type": "string",
-            "defaultValue": "[resourceGroup().name]",
-            "metadata": {
-                "description":"The name of the resource group containing the VNet the VM will be placed in"
-            }
-        },
-        "appSecResourceGroup": {
-            "type": "string",
-            "defaultValue": "[resourceGroup().name]",
-            "metadata": {
-                "description":"The name of the resource group containing the existing Application Security Group."
             }
         },
         "availabilityZone": {
@@ -107,18 +64,19 @@
         }
     },
     "variables": {
+        "networkApiVersion": "2019-11-01",
+        "vmApiVersion": "2019-07-01",
+        "storageApiVersion": "2019-06-01",
+        "resourceDeploymentsApiVersion": "2019-10-01",
         "location":"[resourceGroup().location]",
         "diagAcctName": "[concat(parameters('vmName'),uniqueString(resourceGroup().id))]",
-        "nicName": "[concat(parameters('vmName'),uniqueString(resourceGroup().id))]",
-        "vnetId": "[resourceId(parameters('networkResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
-        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
-        "nicRef": "[concat(variables('nicName'),parameters('createAppSecGroup'))]"
+        "nicName": "[concat(parameters('vmName'),uniqueString(resourceGroup().id))]"
     },
     "resources": [
         {
             "name": "[variables('diagAcctName')]",
             "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2019-04-01",
+            "apiVersion": "[variables('storageApiVersion')]",
             "sku": {
               "name": "Standard_LRS"
             },
@@ -134,72 +92,18 @@
             "resources": []
         },
         {
-            "condition": "[equals(parameters('createAppSecGroup'),'create')]",
-            "name": "[parameters('appSecGroup')]",
-            "type": "Microsoft.Network/applicationSecurityGroups",
-            "apiVersion": "2019-09-01",
-            "location": "[variables('location')]",
-            "tags": {
-                "environment":"[parameters('environment')]"
-            },
-            "properties": {}
-        },
-        {
-            "condition": "[equals(parameters('createAppSecGroup'),'create')]",
-            "name": "[concat(variables('nicName'),'create')]",
+            "name": "[variables('nicName')]",
             "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2018-11-01",
+            "apiVersion": "[variables('networkApiVersion')]",
             "location": "[variables('location')]",
-            "dependsOn": [
-                "[concat('Microsoft.Network/applicationSecurityGroups/', parameters('appSecGroup'))]"
-            ],
             "properties": {
                 "ipConfigurations": [
                     {
                         "name": "ipconfig1",
                         "properties": {
                             "subnet": {
-                                "id": "[variables('subnetRef')]"
-                            },
-                            "privateIPAddress":"[parameters('privateIp')]",
-                            "privateIPAllocationMethod": "Static",
-                            "applicationSecurityGroups":[
-                                {
-                                    "id":"[resourceId('Microsoft.Network/applicationSecurityGroups', parameters('appSecGroup'))]"
-                                }
-                            ]
-                        }
-                    }
-                ]
-            },
-            "tags": {
-                "Environment":"[parameters('environment')]"
-            }
-        },
-        {
-            "condition": "[equals(parameters('createAppSecGroup'),'exist')]",
-            "name": "[concat(variables('nicName'),'exist')]",
-            "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2018-11-01",
-            "location": "[variables('location')]",
-            "dependsOn": [
-                "[concat('Microsoft.Network/applicationSecurityGroups/', parameters('appSecGroup'))]"
-            ],
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "ipconfig1",
-                        "properties": {
-                            "subnet": {
-                                "id": "[variables('subnetRef')]"
-                            },
-                            "privateIPAddress":"[parameters('privateIp')]",
-                            "privateIPAllocationMethod": "Static",
-                            "applicationSecurityGroups":[
-                                {
-                                    "id":"[resourceId(parameters('appSecResourceGroup'), 'Microsoft.Network/applicationSecurityGroups', parameters('appSecGroup'))]"
-                                }
-                            ]
+                                "id": "[parameters('subnetRef')]"
+                            }
                         }
                     }
                 ]
@@ -211,13 +115,12 @@
         {
             "name": "[parameters('vmName')]",
             "type": "Microsoft.Compute/virtualMachines",
-            "apiVersion": "2018-10-01",
+            "apiVersion": "[variables('vmApiVersion')]",
             "location": "[variables('location')]",
             "zones": [
                 "[parameters('availabilityZone')]"
             ],
             "dependsOn": [
-                "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'),parameters('createAppSecGroup'))]",
                 "[concat('Microsoft.Storage/storageAccounts/', variables('diagAcctName'))]"
             ],
             "properties": {
@@ -241,7 +144,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicRef'))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
                         }
                     ]
                 },
@@ -268,7 +171,7 @@
                 {
                     "type": "extensions",
                     "name": "OMSExtension",
-                    "apiVersion": "2019-03-01",
+                    "apiVersion": "[variables('vmApiVersion')]",
                     "location": "[variables('location')]",
                     "dependsOn": [
                         "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
@@ -290,7 +193,7 @@
         },
         {
             "name": "microsoft.network-watcher-windows-20190601220444",
-            "apiVersion": "2015-01-01",
+            "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "incremental",
