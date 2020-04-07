@@ -831,7 +831,7 @@
                         "value": "vmhubprim"
                     },
                     "subnetRef": {
-                        "value": "[concat(resourceId('Microsoft.Network/virtualNetworks', variables('hubVnetName')),'/subnets/',variables('primarySubnetName'))]"
+                        "value": "[concat(resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName')),variables('primarySubnetName'))]"
                     },
                     "virtualMachineSize": {
                         "value": "[variables('vmSize')]"
@@ -875,7 +875,7 @@
                         "value": "vmhubprim"
                     },
                     "subnetRef": {
-                        "value": "[concat(resourceId('Microsoft.Network/virtualNetworks', variables('hubVnetName')),'/subnets/',variables('secondarySubnetName'))]"
+                        "value": "[concat(resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName')),variables('secondarySubnetName'))]"
                     },
                     "virtualMachineSize": {
                         "value": "[variables('vmSize')]"
@@ -923,7 +923,7 @@
                         "value": "vmonprempri"
                     },
                     "subnetRef": {
-                        "value": "[concat(resourceId('Microsoft.Network/virtualNetworks', variables('onPremVnetName')),'/subnets/',variables('primarySubnetName'))]"
+                        "value": "[concat(resourceId('Microsoft.Network/virtualNetworks/subnets', variables('onPremVnetName')),variables('primarySubnetName'))]"
                     },
                     "virtualMachineSize": {
                         "value": "[variables('vmSize')]"
@@ -967,7 +967,7 @@
                         "value": "[concat('vmspoke',copyIndex(1),'app')]"
                     },
                     "subnetRef": {
-                        "value": "[concat(resourceId('Microsoft.Network/virtualNetworks', concat(variables('spokeVnetName'),copyIndex(1))),'/subnets/',variables('appSubnetName'))]"
+                        "value": "[concat(resourceId('Microsoft.Network/virtualNetworks/subnets', concat(variables('spokeVnetName'),copyIndex(1))),variables('appSubnetName'))]"
                     },
                     "virtualMachineSize": {
                         "value": "[variables('vmSize')]"
