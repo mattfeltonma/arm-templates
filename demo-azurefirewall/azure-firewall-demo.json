@@ -880,11 +880,11 @@
                     "adminUserName": {
                         "value": "[parameters('vmAdminUsername')]"
                     },
-                    "workspaceId":
+                    "myWorkspaceId":
                     {
                         "value": "[resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName'))]"
                     },
-                    "workspaceSecret":
+                    "myWorkspaceKey":
                     {
                         "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-11-01-preview').primarySharedKey]"
                     }
