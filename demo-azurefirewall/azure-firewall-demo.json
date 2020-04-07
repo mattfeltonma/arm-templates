@@ -828,7 +828,7 @@
                         "value": "[parameters('tagValues')]"
                     },
                     "vmName": {
-                        "value": "vm-hub-prim"
+                        "value": "vmhubprim"
                     },
                     "subnetRef": {
                         "value": "[concat(resourceId('Microsoft.Network/virtualNetworks', variables('hubVnetName')),'/subnets/',variables('primarySubnetName'))]"
@@ -872,7 +872,7 @@
                         "value": "[parameters('tagValues')]"
                     },
                     "vmName": {
-                        "value": "vm-hub-prim"
+                        "value": "vmhubprim"
                     },
                     "subnetRef": {
                         "value": "[concat(resourceId('Microsoft.Network/virtualNetworks', variables('hubVnetName')),'/subnets/',variables('secondarySubnetName'))]"
@@ -920,7 +920,7 @@
                         "value": "[parameters('tagValues')]"
                     },
                     "vmName": {
-                        "value": "vm-onprem-pri"
+                        "value": "vmonprempri"
                     },
                     "subnetRef": {
                         "value": "[concat(resourceId('Microsoft.Network/virtualNetworks', variables('onPremVnetName')),'/subnets/',variables('primarySubnetName'))]"
@@ -964,7 +964,7 @@
                         "value": "[parameters('tagValues')]"
                     },
                     "vmName": {
-                        "value": "[concat('vm-spoke',copyIndex(1),'-app')]"
+                        "value": "[concat('vmspoke',copyIndex(1),'app')]"
                     },
                     "subnetRef": {
                         "value": "[concat(resourceId('Microsoft.Network/virtualNetworks', concat(variables('spokeVnetName'),copyIndex(1))),'/subnets/',variables('appSubnetName'))]"
