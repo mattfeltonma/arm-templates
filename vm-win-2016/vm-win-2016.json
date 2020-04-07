@@ -45,15 +45,15 @@
             }
         },
         "availabilityZone": {
-            "type":"string",
+            "type": "int",
             "defaultValue": 1,
             "metadata": {
                 "description": "The availability zone number you want to place the VM into"
             },
             "allowedValues":[
-                "1",
-                "2",
-                "3"
+                1,
+                2,
+                3
             ]
         },
         "tagValues": {
