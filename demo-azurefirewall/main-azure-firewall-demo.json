@@ -872,7 +872,7 @@
                         "value": "vm-onprem-pri"
                     },
                     "subnetRef": {
-                        "value": "[concat(resourceId('Microsoft.Network/virtualNetworks', variables('onPremVnetName'),'/subnets/',variables('primarySubnetName'))]"
+                        "value": "[concat(resourceId('Microsoft.Network/virtualNetworks', variables('onPremVnetName')),'/subnets/',variables('primarySubnetName'))]"
                     },
                     "virtualMachineSize": {
                         "value": "[variables('vmSize')]"
@@ -913,7 +913,7 @@
                         "value": "[concat('vm-spoke',copyIndex(1),'-app')]"
                     },
                     "subnetRef": {
-                        "value": "[concat(resourceId('Microsoft.Network/virtualNetworks', concat(variables('spokeVnetName'),copyIndex(1))),'/subnets/',variables('appSubnetName'))]"
+                        "value": "[concat(resourceId('Microsoft.Network/virtualNetworks', concat(variables('spokeVnetName')),copyIndex(1))),'/subnets/',variables('appSubnetName'))]"
                     },
                     "virtualMachineSize": {
                         "value": "[variables('vmSize')]"
