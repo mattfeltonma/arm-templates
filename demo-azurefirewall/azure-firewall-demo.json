@@ -68,7 +68,7 @@
         "onpremVngConnName": "conn-onpremtohub",
         "onPremVngPublicIpName": "pip-onpremvng",
         "onPremVngName": "vng-onprem",
-        "vngConnectionSecret": "[uniqueString(resourceGroup().id, deployment().name)]",
+        "vngConnectionSecret": "[uniqueString(subscription().id, resourceGroup().id)]",
         "laWorkspaceName": "[concat('la-',uniqueString(resourceGroup().id))]",
         "bastionName": "bstss",
         "azureFirewallName": "fwhub",

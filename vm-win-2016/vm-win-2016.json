@@ -69,7 +69,7 @@
         "storageApiVersion": "2019-06-01",
         "resourceDeploymentsApiVersion": "2019-10-01",
         "location":"[resourceGroup().location]",
-        "diagAcctName": "[concat('st',uniqueString(deployment().name))]",
+        "diagAcctName": "[concat('st',uniqueString(parameters('myWorkspaceId')))]",
         "nicName": "[concat(parameters('vmName'),uniqueString(resourceGroup().id))]"
     },
     "resources": [
