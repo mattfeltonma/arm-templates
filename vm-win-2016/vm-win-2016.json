@@ -186,7 +186,7 @@
             ]
         },
         {
-            "name": "microsoft.network-watcher-windows-20190601220444",
+            "name": "[concat('networkwatcher',parameters('vmName'))]",
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
