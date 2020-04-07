@@ -913,7 +913,7 @@
                         "value": "[concat('vm-spoke',copyIndex(1),'-app')]"
                     },
                     "subnetRef": {
-                        "value": "[concat(resourceId('Microsoft.Network/virtualNetworks', concat(variables('spokeVnetName')),copyIndex(1))),'/subnets/',variables('appSubnetName'))]"
+                        "value": "[concat(resourceId('Microsoft.Network/virtualNetworks', concat(variables('spokeVnetName'),copyIndex(1))),'/subnets/',variables('appSubnetName'))]"
                     },
                     "virtualMachineSize": {
                         "value": "[variables('vmSize')]"
