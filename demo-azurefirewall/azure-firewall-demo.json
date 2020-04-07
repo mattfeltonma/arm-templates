@@ -839,11 +839,14 @@
                     "adminUserName": {
                         "value": "[parameters('vmAdminUsername')]"
                     },
-                    "workspaceId":
+                    "adminPassword": {
+                        "value": "[parameters('vmAdminPassword')]"
+                    },
+                    "myWorkspaceId":
                     {
                         "value": "[resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName'))]"
                     },
-                    "workspaceSecret":
+                    "myWorkspaceKey":
                     {
                         "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-11-01-preview').primarySharedKey]"
                     }
@@ -879,6 +882,9 @@
                     },
                     "adminUserName": {
                         "value": "[parameters('vmAdminUsername')]"
+                    },
+                    "adminPassword": {
+                        "value": "[parameters('vmAdminPassword')]"
                     },
                     "myWorkspaceId":
                     {
@@ -925,11 +931,14 @@
                     "adminUserName": {
                         "value": "[parameters('vmAdminUsername')]"
                     },
-                    "workspaceId":
+                    "adminPassword": {
+                        "value": "[parameters('vmAdminPassword')]"
+                    },
+                    "myWorkspaceId":
                     {
                         "value": "[resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName'))]"
                     },
-                    "workspaceSecret":
+                    "myWorkspaceKey":
                     {
                         "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-11-01-preview').primarySharedKey]"
                     }
@@ -966,11 +975,14 @@
                     "adminUserName": {
                         "value": "[parameters('vmAdminUsername')]"
                     },
-                    "workspaceId":
+                    "adminPassword": {
+                        "value": "[parameters('vmAdminPassword')]"
+                    },
+                    "myWorkspaceId":
                     {
                         "value": "[resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName'))]"
                     },
-                    "workspaceSecret":
+                    "myWorkspaceKey":
                     {
                         "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-11-01-preview').primarySharedKey]"
                     }
