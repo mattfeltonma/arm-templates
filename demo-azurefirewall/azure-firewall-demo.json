@@ -1025,7 +1025,7 @@
                     },
                     "myWorkspaceKey":
                     {
-                        "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces\',variables('laWorkspaceName')), '2015-03-20-preview').primarySharedKey]"
+                        "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces\',variables('laWorkspaceName')), '2015-03-20').primarySharedKey]"
                     }
                 },
                 "templateLink": {
