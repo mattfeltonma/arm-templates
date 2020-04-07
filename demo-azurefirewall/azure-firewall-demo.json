@@ -604,8 +604,8 @@
                                     ],
                                     "protocols": [
                                         {
-                                            "protocolType": "TCP",
-                                            "port": "3389"
+                                            "protocolType": "Https",
+                                            "port": "443"
                                         }
                                     ],
                                     "targetFqdns": [
