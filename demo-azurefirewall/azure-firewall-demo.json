@@ -78,6 +78,7 @@
         "vmSize": "Standard_DS2_v2"
     },
     "resources": [
+        /* Create centralized Log Analytics Workspace */
         {
             "name": "[variables('laWorkspaceName')]",
             "type": "Microsoft.OperationalInsights/workspaces",
@@ -93,6 +94,7 @@
             "resources": [
             ]
         },
+        /* Create hub Virtual Network */
         {
             "type": "Microsoft.Network/virtualNetworks",
             "name": "[variables('hubVnetName')]",
@@ -148,6 +150,7 @@
             "resources": [
             ]
         },
+        /* Create on-premises Virtual Network */
         {
             "type": "Microsoft.Network/virtualNetworks",
             "name": "[variables('onPremVnetName')]",
@@ -179,6 +182,7 @@
             "resources": [
             ]
         },
+        /* Create two spoke Virtual Networks */
         {
             "type": "Microsoft.Network/virtualNetworks",
             "name": "[concat(variables('spokeVnetName'),copyIndex(1))]",
@@ -214,6 +218,7 @@
             "resources": [
             ]
         },
+        /* Create Public IP for hub Virtual Network Gateway */
         {
             "name": "[variables('hubVngPublicIpName')]",
             "type": "Microsoft.Network/publicIpAddresses",
@@ -227,6 +232,7 @@
                 "name": "Basic"
             }
         },
+        /* Create hub Virtual Network Gateway */
         {
             "name": "[variables('hubVngName')]",
             "type": "Microsoft.Network/virtualNetworkGateways",
@@ -261,6 +267,7 @@
                 }
             }
         },
+        /* Create Public IP for on-premises Virtual Network Gateway */
         {
             "name": "[variables('onPremVngPublicIpName')]",
             "type": "Microsoft.Network/publicIpAddresses",
@@ -274,6 +281,7 @@
                 "name": "Basic"
             }
         },
+        /* Create on-premises Virtual Network Gateway */
         {
             "name": "[variables('onPremVngName')]",
             "type": "Microsoft.Network/virtualNetworkGateways",
@@ -308,6 +316,7 @@
                 }
             }
         },
+        /* Create VPN connection to connect hub Virtual Network Gateway to on-premises Virtual Network Gateway */
         {
             "name": "[variables('hubVngConnName')]",
             "type": "Microsoft.Network/connections",
@@ -338,6 +347,7 @@
                 ]
             }
         },
+        /* Create VPN connection to connect on-premises Virtual Network Gateway to hub Virtual Network Gateway */
         {
             "name": "[variables('onpremVngConnName')]",
             "type": "Microsoft.Network/connections",
@@ -369,6 +379,7 @@
                 ]
             }
         },
+        /* Create Virtual Network Peering on hub to peer each spoke to it */
         {
             "name": "[concat(variables('hubVnetName'),'/',variables('hubToSpokePeeringName'),copyIndex(1))]",
             "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
@@ -392,6 +403,7 @@
                 "count": "[length(variables('spokeCidrs'))]"
             }
         },
+        /* Create Virtual Network Peering on each spoke to peer it to the hub */
         {
             "name": "[concat(variables('spokeVnetName'),copyIndex(1),'/',variables('spokeToHubPeeringName'))]",
             "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
@@ -416,6 +428,7 @@
                 "count": "[length(variables('spokeCidrs'))]"
             }
         },
+        /* Create a Public IP for the Azure Bastion service hosted in the hub Virtual Network */
         {
             "name": "[variables('bastionPublicIpName')]",
             "type": "Microsoft.Network/publicIpAddresses",
@@ -429,6 +442,7 @@
                 "name": "Standard"
             }
         },
+        /* Create an Azure Bastion instance in the hub Virtual Network */
         {
             "name": "[variables('bastionName')]",
             "type": "Microsoft.Network/bastionHosts",
@@ -456,6 +470,7 @@
                 ]
             }
         },
+        /* Create a Public IP for the Azure Firewall instance */
         {
             "name": "[variables('azFirewallPublicIpName')]",
             "type": "Microsoft.Network/publicIpAddresses",
@@ -469,6 +484,7 @@
                 "name": "Standard"
             }
         },
+        /* Create a Public IP for Azure Firewall Management to support forced tunneling */
         {
             "name": "[variables('azFirewallMgmtPublicIpName')]",
             "type": "Microsoft.Network/publicIpAddresses",
@@ -482,6 +498,7 @@
                 "name": "Standard"
             }
         },
+        /* Create the Azure Firewall instance */
         {
             "name": "[variables('azureFirewallName')]",
             "type": "Microsoft.Network/azureFirewalls",
@@ -647,6 +664,7 @@
                 }
             }
         },
+        /* Configure the diagnostic settings for Azure Firewall to write the Log Analytics Workspace */
         {
             "name": "[concat(variables('azureFirewallName'),'/microsoft.insights/diag')]",
             "type": "Microsoft.Network/azureFirewalls/providers/diagnosticSettings",
@@ -679,6 +697,7 @@
             "resources": [
             ]
         },
+        /* Create a Route Table for the Gateway Subnet in the hub Virtual Network */
         {
             "name": "[variables('hubVNGRouteTable')]",
             "type": "Microsoft.Network/routeTables",
@@ -704,6 +723,7 @@
             "resources": [
             ]
         },
+        /* Create a Route Table for the primary and secondary subnets in the hub Virtual Network */
         {
             "name": "[variables('hubRouteTable')]",
             "type": "Microsoft.Network/routeTables",
@@ -744,6 +764,8 @@
             "resources": [
             ]
         },
+        /* Create two URDs (User Defined Routes) for the route table applied to the primary and secondary
+        subnets in the hub Virtual Network to route destinated to the spoke Virtual Networks to Azure Firewall */
         {
             "name": "[concat(variables('hubRouteTable'),'/','udr-spoke',copyIndex(1))]",
             "type": "Microsoft.Network/routeTables/routes",
@@ -762,6 +784,8 @@
                 "count": "[length(variables('spokeCidrs'))]"
             }
         },
+        /* Create two URDs (User Defined Routes) for the route table applied to the Gateway Subnet
+        in the hub Virtual Network to route destinated to the spoke Virtual Networks to Azure Firewall */
         {
             "name": "[concat(variables('hubVNGRouteTable'),'/','udr-spoke',copyIndex(1))]",
             "type": "Microsoft.Network/routeTables/routes",
@@ -780,6 +804,7 @@
                 "count": "[length(variables('spokeCidrs'))]"
             }
         },
+        /* Create a Route Table for the app and data subnets in the spoke Virtual Network */
         {
             "name": "[variables('spokeRouteTable')]",
             "type": "Microsoft.Network/routeTables",
@@ -813,12 +838,15 @@
             "resources": [
             ]
         },
+        /* Deploy a VM into the primary subnet in the hub Virtual Network */
         {
             "name": "vm-hub-prim",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]",
+                "[concat('Microsoft.Network/routeTables/', variables('hubRouteTable'))]",  
+                "[concat('Microsoft.Network/azureFirewalls/', variables('azureFirewallName'))]",              
                 "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]"
             ],
             "properties": {
@@ -857,12 +885,15 @@
                 }
             }
         },
+        /* Deploy two VMs into the secondary subnet in the hub Virtual Network */
         {
             "name": "[concat('vm-hub-sec',copyIndex(1))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]",
+                "[concat('Microsoft.Network/routeTables/', variables('hubRouteTable'))]",
+                "[concat('Microsoft.Network/azureFirewalls/', variables('azureFirewallName'))]",
                 "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]"
             ],
             "properties": {
@@ -905,12 +936,17 @@
                 "count": 2
             }
         },
+        /* Deploy a VM into the primary subnet in the on-premises Virtual Network */
         {
             "name": "vm-onprem-hub",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/virtualNetworks/', variables('onPremVnetName'))]",
+                "[concat('Microsoft.Network/connections/', variables('onpremVngConnName'))]",
+                "[concat('Microsoft.Network/connections/', variables('hubVngConnName'))]",
+                "[concat('Microsoft.Network/routeTables/', variables('hubVNGRouteTable'))]",                
+                "[concat('Microsoft.Network/azureFirewalls/', variables('azureFirewallName'))]",
                 "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]"
             ],
             "properties": {
@@ -949,12 +985,17 @@
                 }
             }
         },
+        /* Deploy a VM into the app subnet in each spoke Virtual Network */
         {
             "name": "[concat('vm-spoke-app',copyIndex(1))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/virtualNetworks/', variables('spokeVnetName'), copyIndex(1))]",
+                "[concat(concat('Microsoft.Network/virtualNetworks/', variables('spokeVnetName'), copyIndex(1)),'/virtualNetworkPeerings/',variables('spokeToHubPeeringName'))]",
+                "[concat(concat('Microsoft.Network/routeTables/',variables('hubRouteTable')),'/routes/',concat('udr-spoke',copyIndex(1)))]",
+                "[concat('Microsoft.Network/routeTables',variables('spokeRouteTable'))]",
+                "[concat('Microsoft.Network/azureFirewalls/', variables('azureFirewallName'))]",
                 "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]"
             ],
             "properties": {
