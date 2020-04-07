@@ -2,65 +2,65 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "environment": {
-            "type": "string",
-            "metadata": {
-                "description": "Value used for Environment applied to all taggable resources"
-            }
-        },
         "vmName": {
             "type": "string",
             "metadata": {
-                "description":"VM Name"
+                "description": "VM Name"
             }
         },
         "subnetRef": {
             "type": "string",
             "metadata": {
-                "description":"Subnet reference for the VM's NIC"
+                "description": "Subnet reference for the VM's NIC"
             }
         },
         "virtualMachineSize": {
             "type": "string",
             "metadata": {
-                "description":"VM Size"
+                "description": "VM Size"
             }
         },
         "adminUsername": {
             "type": "string",
             "metadata": {
-                "description":"Name of the administrator account created on the VM"
+                "description": "Name of the administrator account created on the VM"
             }
         },
         "adminPassword": {
             "type": "securestring",
             "metadata": {
-                "description":"The password for the administrator account created on the VM"
+                "description": "The password for the administrator account created on the VM"
             }
         },
         "myWorkspaceId": {
             "type":"string",
             "metadata": {
-                "description":"The Log and Analytics workspace ID that the Microsoft Monitoring Agent will deliver metrics and logs to"
+                "description": "The Log and Analytics workspace ID that the Microsoft Monitoring Agent will deliver metrics and logs to"
             }
         },
         "myWorkspaceKey": {
             "type":"string",
             "metadata": {
-                "description":"The Log and Analytics workspace secret"
+                "description": "The Log and Analytics workspace secret"
             }
         },
         "availabilityZone": {
             "type":"string",
             "defaultValue": 1,
             "metadata": {
-                "description":"The availability zone number you want to place the VM into"
+                "description": "The availability zone number you want to place the VM into"
             },
             "allowedValues":[
                 "1",
                 "2",
                 "3"
             ]
+        },
+        "tagValues": {
+            "type": "object",
+            "metadata": {
+                "description": "The tags that will be associated to the VM"
+            }
         }
     },
     "variables": {
@@ -82,9 +82,7 @@
             },
             "kind": "StorageV2",
             "location": "[variables('location')]",
-            "tags": {
-                "Environment":"[parameters('environment')]"
-            },
+            "tags": "[parameters('tagValues')]",
             "properties": {
               "accessTier": "Hot",
               "supportsHttpsTrafficOnly": true
@@ -96,6 +94,7 @@
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "[variables('networkApiVersion')]",
             "location": "[variables('location')]",
+            "tags": "[parameters('tagValues')]",
             "properties": {
                 "ipConfigurations": [
                     {
@@ -107,9 +106,6 @@
                         }
                     }
                 ]
-            },
-            "tags": {
-                "Environment":"[parameters('environment')]"
             }
         },
         {
@@ -117,6 +113,7 @@
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "[variables('vmApiVersion')]",
             "location": "[variables('location')]",
+            "tags": "[parameters('tagValues')]",
             "zones": [
                 "[parameters('availabilityZone')]"
             ],
@@ -163,9 +160,6 @@
                         "storageUri": "[concat('https://', variables('diagAcctName'), '.blob.core.windows.net/')]"
                     }
                 }
-            },
-            "tags": {
-                "Environment":"[parameters('environment')]"
             },
             "resources": [
                 {

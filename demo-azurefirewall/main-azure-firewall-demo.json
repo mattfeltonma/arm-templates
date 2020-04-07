@@ -2,10 +2,10 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "environment": {
-            "type": "string",
+        "tagValues": {
+            "type": "object",
             "metadata": {
-                "description": "Value used for Environment applied to all taggable resources"
+                "description": "The tags that will be associated to the VM"
             }
         },
         "vmAdminUsername": {
@@ -83,6 +83,7 @@
             "type": "Microsoft.OperationalInsights/workspaces",
             "apiVersion": "[variables('laApiVersion')]",
             "location": "[variables('location')]",
+            "tags":"[parameters('tagValues')]",
             "properties": {
                 "sku": {
                     "name": "PerGB2018"
@@ -97,6 +98,7 @@
             "name": "[variables('hubVnetName')]",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
+            "tags":"[parameters('tagValues')]",
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
@@ -151,6 +153,7 @@
             "name": "[variables('onPremVnetName')]",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
+            "tags":"[parameters('tagValues')]",
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
@@ -181,6 +184,7 @@
             "name": "[concat(variables('spokeVnetName'),copyIndex(1))]",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
+            "tags":"[parameters('tagValues')]",
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
@@ -215,14 +219,12 @@
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
+            "tags":"[parameters('tagValues')]",
             "properties": {
                 "publicIpAllocationMethod": "Dynamic"
             },
             "sku": {
                 "name": "Basic"
-            },
-            "tags": {
-                "Environment": "[parameters('environment')]"
             }
         },
         {
@@ -230,6 +232,7 @@
             "type": "Microsoft.Network/virtualNetworkGateways",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
+            "tags":"[parameters('tagValues')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/publicIPAddresses/', variables('hubVngPublicIpName'))]",
                 "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]"
@@ -263,14 +266,12 @@
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
+            "tags":"[parameters('tagValues')]",
             "properties": {
                 "publicIpAllocationMethod": "Dynamic"
             },
             "sku": {
                 "name": "Basic"
-            },
-            "tags": {
-                "Environment": "[parameters('environment')]"
             }
         },
         {
@@ -278,6 +279,7 @@
             "type": "Microsoft.Network/virtualNetworkGateways",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
+            "tags":"[parameters('tagValues')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/publicIPAddresses/', variables('onPremVngPublicIpName'))]",
                 "[concat('Microsoft.Network/virtualNetworks/', variables('onPremVnetName'))]"
@@ -311,6 +313,7 @@
             "type": "Microsoft.Network/connections",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
+            "tags":"[parameters('tagValues')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/virtualNetworkGateways/', variables('hubVngName'))]",
                 "[concat('Microsoft.Network/virtualNetworkGateways/', variables('onPremVngName'))]"
@@ -340,6 +343,7 @@
             "type": "Microsoft.Network/connections",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
+            "tags":"[parameters('tagValues')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/virtualNetworkGateways/', variables('hubVngName'))]",
                 "[concat('Microsoft.Network/virtualNetworkGateways/', variables('onPremVngName'))]"
@@ -417,14 +421,12 @@
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
+            "tags":"[parameters('tagValues')]",
             "properties": {
                 "publicIpAllocationMethod": "Static"
             },
             "sku": {
                 "name": "Standard"
-            },
-            "tags": {
-                "Environment": "[parameters('environment')]"
             }
         },
         {
@@ -436,9 +438,7 @@
                 "[concat('Microsoft.Network/publicIpAddresses/', variables('bastionPublicIpName'))]",
                 "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]"
             ],
-            "tags": {
-                "Environment": "[parameters('environment')]"
-            },
+            "tags":"[parameters('tagValues')]",
             "properties": {
                 "ipConfigurations": [
                     {
@@ -461,14 +461,12 @@
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
+            "tags":"[parameters('tagValues')]",
             "properties": {
                 "publicIpAllocationMethod": "Static"
             },
             "sku": {
                 "name": "Standard"
-            },
-            "tags": {
-                "Environment": "[parameters('environment')]"
             }
         },
         {
@@ -476,14 +474,12 @@
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
+            "tags":"[parameters('tagValues')]",
             "properties": {
                 "publicIpAllocationMethod": "Static"
             },
             "sku": {
                 "name": "Standard"
-            },
-            "tags": {
-                "Environment": "[parameters('environment')]"
             }
         },
         {
@@ -491,6 +487,7 @@
             "type": "Microsoft.Network/azureFirewalls",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
+            "tags":"[parameters('tagValues')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/publicIpAddresses/', variables('azFirewallPublicIpName'))]",
                 "[concat('Microsoft.Network/publicIpAddresses/', variables('azFirewallMgmtPublicIpName'))]"
@@ -655,6 +652,7 @@
             "type": "Microsoft.Network/azureFirewalls/providers/diagnosticSettings",
             "apiVersion": "[variables('diagApiVersion')]",
             "location": "[variables('location')]",
+            "tags":"[parameters('tagValues')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/azureFirewalls/',variables('azureFirewallName'))]"
             ],
@@ -686,6 +684,7 @@
             "type": "Microsoft.Network/routeTables",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
+            "tags":"[parameters('tagValues')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/azureFirewalls/',variables('azureFirewallName'))]"
             ],
@@ -710,6 +709,7 @@
             "type": "Microsoft.Network/routeTables",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
+            "tags":"[parameters('tagValues')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/azureFirewalls/',variables('azureFirewallName'))]"
             ],
@@ -785,6 +785,7 @@
             "type": "Microsoft.Network/routeTables",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
+            "tags":"[parameters('tagValues')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/azureFirewalls/',variables('azureFirewallName'))]"
             ],
@@ -823,8 +824,8 @@
             "properties": {
                 "mode": "Incremental",
                 "parameters": {
-                    "environment": {
-                        "value": "[parameters('environment')]"
+                    "tagValues": {
+                        "value": "[parameters('tagValues')]"
                     },
                     "vmName": {
                         "value": "vm-hub-prim"
@@ -864,8 +865,8 @@
             "properties": {
                 "mode": "Incremental",
                 "parameters": {
-                    "environment": {
-                        "value": "[parameters('environment')]"
+                    "tagValues": {
+                        "value": "[parameters('tagValues')]"
                     },
                     "vmName": {
                         "value": "vm-onprem-pri"
@@ -905,8 +906,8 @@
             "properties": {
                 "mode": "Incremental",
                 "parameters": {
-                    "environment": {
-                        "value": "[parameters('environment')]"
+                    "tagValues": {
+                        "value": "[parameters('tagValues')]"
                     },
                     "vmName": {
                         "value": "[concat('vm-spoke',copyIndex(1),'-app')]"
