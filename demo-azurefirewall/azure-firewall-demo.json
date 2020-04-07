@@ -1021,7 +1021,7 @@
                     },
                     "myWorkspaceId":
                     {
-                        "value": "[resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName'))]"
+                        "value": "[reference(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-03-20').customerId]"
                     },
                     "myWorkspaceKey":
                     {
