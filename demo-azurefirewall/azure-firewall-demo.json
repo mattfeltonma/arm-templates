@@ -872,11 +872,11 @@
                     },
                     "myWorkspaceId":
                     {
-                        "value": "[resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName'))]"
+                        "value": "[reference(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-03-20').customerId]"
                     },
                     "myWorkspaceKey":
                     {
-                        "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-11-01-preview').primarySharedKey]"
+                        "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-03-20').primarySharedKey]"
                     }
                 },
                 "templateLink": {
@@ -919,11 +919,11 @@
                     },
                     "myWorkspaceId":
                     {
-                        "value": "[resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName'))]"
+                        "value": "[reference(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-03-20').customerId]"
                     },
                     "myWorkspaceKey":
                     {
-                        "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-11-01-preview').primarySharedKey]"
+                        "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-03-20').primarySharedKey]"
                     }
                 },
                 "templateLink": {
@@ -972,11 +972,11 @@
                     },
                     "myWorkspaceId":
                     {
-                        "value": "[resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName'))]"
+                        "value": "[reference(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-03-20').customerId]"
                     },
                     "myWorkspaceKey":
                     {
-                        "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-11-01-preview').primarySharedKey]"
+                        "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-03-20').primarySharedKey]"
                     }
                 },
                 "templateLink": {
