@@ -872,7 +872,7 @@
                         "value": "[parameters('tagValues')]"
                     },
                     "vmName": {
-                        "value": "vmhubprim"
+                        "value": "[concat('vmhubsec',copyIndex(1))]"
                     },
                     "subnetRef": {
                         "value": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'),variables('secondarySubnetName'))]"
