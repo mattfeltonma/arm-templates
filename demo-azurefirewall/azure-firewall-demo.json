@@ -875,6 +875,15 @@
                     "spokeRouteTableId": {
                         "value": "[resourceId('Microsoft.Network/routeTables',variables('spokeRouteTable'))]"
                     },
+                    "hubVnetName": {
+                        "value": "[variables('hubVnetName')]"
+                    },
+                    "primarySubnetName": {
+                        "value": "[variables('primarySubnetName')]"
+                    },
+                    "secondaryVnetName": {
+                        "value": "[variables('secondarySubnetName')]"
+                    },
                     "spokeVnetName": {
                         "value": "[variables('spokeVnetName')]"
                     },
@@ -890,6 +899,15 @@
                     "contentVersion": "1.0.0.0",
                     "parameters": {
                         "netApiVersionNum": {
+                            "type": "string"
+                        },
+                        "hubVnetName": {
+                            "type": "string"
+                        },
+                        "primarySubnetName": {
+                            "type": "string"
+                        },
+                        "secondarySubnetName": {
                             "type": "string"
                         },
                         "hubGatewaySubnetRouteTableId": {
@@ -913,7 +931,7 @@
                     },
                     "resources": [
                         {
-                            "name": "[concat(variables('hubVnetName'),'/GatewaySubnet')]",
+                            "name": "[concat(parameters('hubVnetName'),'/GatewaySubnet')]",
                             "type": "Microsoft.Network/virtualNetwork/subnets",
                             "apiVersion": "[parameters('netApiVersionNum')]",
                             "properties": {
@@ -923,7 +941,7 @@
                             }
                         },
                         {
-                            "name": "[concat(variables('hubVnetName'),'/',variables('primarySubnetName'))]",
+                            "name": "[concat(parameters('hubVnetName'),'/',parameters('primarySubnetName'))]",
                             "type": "Microsoft.Network/virtualNetwork/subnets",
                             "apiVersion": "[parameters('netApiVersionNum')]",
                             "properties": {
@@ -933,7 +951,7 @@
                             }
                         },
                         {
-                            "name": "[concat(variables('hubVnetName'),'/',variables('SecondarySubnetName'))]",
+                            "name": "[concat(parameters('hubVnetName'),'/',parameters('SecondarySubnetName'))]",
                             "type": "Microsoft.Network/virtualNetwork/subnets",
                             "apiVersion": "[parameters('netApiVersionNum')]",
                             "properties": {
