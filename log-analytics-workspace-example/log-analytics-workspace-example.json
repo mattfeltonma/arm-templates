@@ -41,9 +41,13 @@
             "type": "string",
             "value": "[reference(resourceId('Microsoft.OperationalInsights/workspaces',parameters('workspaceName')), '2015-03-20').customerId]"
         },
-        "workspaceKey": {
+        "workspacePrimaryKey": {
             "type": "string",
             "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces',parameters('workspaceName')), '2015-03-20').primarySharedKey]"
+        },
+        "workspaceSecondaryKey": {
+            "type": "string",
+            "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces',parameters('workspaceName')), '2015-03-20').secondarySharedKey]"
         }
     }
 }
