@@ -379,55 +379,6 @@
                 ]
             }
         },
-        /* Create Virtual Network Peering on hub to peer each spoke to it */
-        {
-            "name": "[concat(variables('hubVnetName'),'/',variables('hubToSpokePeeringName'),copyIndex(1))]",
-            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
-            "apiVersion": "[variables('netApiVersionNum')]",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]",
-                "[concat('Microsoft.Network/virtualNetworks/', variables('spokeVnetName'),copyIndex(1))]",
-                "[concat('Microsoft.Network/virtualNetworkGateways/', variables('hubVngName'))]"
-            ],
-            "properties": {
-                "allowVirtualNetworkAccess": "true",
-                "allowForwardedTraffic": "true",
-                "allowGatewayTransit": "true",
-                "remoteVirtualNetwork": {
-                    "id": "[resourceId('Microsoft.Network/virtualNetworks',concat(variables('spokeVnetName'),copyIndex(1)))]"
-                }
-            },
-            "copy": {
-                "name": "copyhubpeerings",
-                "count": "[length(variables('spokeCidrs'))]"
-            }
-        },
-        /* Create Virtual Network Peering on each spoke to peer it to the hub */
-        {
-            "name": "[concat(variables('spokeVnetName'),copyIndex(1),'/',variables('spokeToHubPeeringName'))]",
-            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
-            "apiVersion": "[variables('netApiVersionNum')]",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]",
-                "[concat('Microsoft.Network/virtualNetworks/', variables('spokeVnetName'),copyIndex(1))]",
-                "[concat('Microsoft.Network/virtualNetworkGateways/', variables('hubVngName'))]"
-            ],
-            "properties": {
-                "allowVirtualNetworkAccess": "true",
-                "allowForwardedTraffic": "true",
-                "allowGatewayTransit": "false",
-                "useRemoteGateways": "true",
-                "remoteVirtualNetwork": {
-                    "id": "[resourceId('Microsoft.Network/virtualNetworks',variables('hubVnetName'))]"
-                }
-            },
-            "copy": {
-                "name": "copyspokepeerings",
-                "count": "[length(variables('spokeCidrs'))]"
-            }
-        },
         /* Create a Public IP for the Azure Bastion service hosted in the hub Virtual Network */
         {
             "name": "[variables('bastionPublicIpName')]",
@@ -1005,6 +956,57 @@
                 }
             }
         },
+        /* Create Virtual Network Peering on hub to peer each spoke to it */
+        {
+            "name": "[concat(variables('hubVnetName'),'/',variables('hubToSpokePeeringName'),copyIndex(1))]",
+            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+            "apiVersion": "[variables('netApiVersionNum')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', variables('spokeVnetName'),copyIndex(1))]",
+                "[concat('Microsoft.Network/virtualNetworkGateways/', variables('hubVngName'))]",
+                "Microsoft.Resources/deployments/routeAssignment"
+            ],
+            "properties": {
+                "allowVirtualNetworkAccess": "true",
+                "allowForwardedTraffic": "true",
+                "allowGatewayTransit": "true",
+                "remoteVirtualNetwork": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworks',concat(variables('spokeVnetName'),copyIndex(1)))]"
+                }
+            },
+            "copy": {
+                "name": "copyhubpeerings",
+                "count": "[length(variables('spokeCidrs'))]"
+            }
+        },
+        /* Create Virtual Network Peering on each spoke to peer it to the hub */
+        {
+            "name": "[concat(variables('spokeVnetName'),copyIndex(1),'/',variables('spokeToHubPeeringName'))]",
+            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+            "apiVersion": "[variables('netApiVersionNum')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', variables('spokeVnetName'),copyIndex(1))]",
+                "[concat('Microsoft.Network/virtualNetworkGateways/', variables('hubVngName'))]",
+                "Microsoft.Resources/deployments/routeAssignment"
+            ],
+            "properties": {
+                "allowVirtualNetworkAccess": "true",
+                "allowForwardedTraffic": "true",
+                "allowGatewayTransit": "false",
+                "useRemoteGateways": "true",
+                "remoteVirtualNetwork": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworks',variables('hubVnetName'))]"
+                }
+            },
+            "copy": {
+                "name": "copyspokepeerings",
+                "count": "[length(variables('spokeCidrs'))]"
+            }
+        },
         /* Deploy a VM into the primary subnet in the hub Virtual Network */
         {
             "name": "vm-hub-prim",
@@ -1170,7 +1172,8 @@
                 "[concat('Microsoft.Network/routeTables/',variables('spokeRouteTable'))]",
                 "[concat('Microsoft.Network/azureFirewalls/', variables('azureFirewallName'))]",
                 "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]",
-                "Microsoft.Resources/deployments/routeAssignment"
+                "[concat('Microsoft.Network/virtualNetworks',variables('hubVnetName'),'/virtualNetworkPeerings/',variables('hubToSpokePeeringName'),copyIndex(1))]",
+                "[concat('Microsoft.Network/virtualNetworks',variables('spokeVnetName'),copyIndex(1),'/virtualNetworkPeerings/',variables('spokeToHubPeeringName'),copyIndex(1))]"
             ],
             "properties": {
                 "mode": "Incremental",
