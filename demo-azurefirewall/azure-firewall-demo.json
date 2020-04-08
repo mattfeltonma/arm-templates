@@ -881,7 +881,7 @@
                     "primarySubnetName": {
                         "value": "[variables('primarySubnetName')]"
                     },
-                    "secondaryVnetName": {
+                    "secondarySubnetName": {
                         "value": "[variables('secondarySubnetName')]"
                     },
                     "spokeVnetName": {
