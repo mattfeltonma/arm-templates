@@ -867,13 +867,13 @@
                     },
                     "hubGatewaySubnetRouteTableId":
                     {
-                        "value": "[reference(resourceId('Microsoft.Network/routeTables',variables('hubVNGRouteTable')))]"
+                        "value": "[resourceId('Microsoft.Network/routeTables',variables('hubVNGRouteTable'))]"
                     },
                     "hubRouteTableId": {
-                        "value": "[reference(resourceId('Microsoft.Network/routeTables',variables('hubRouteTable')))]"
+                        "value": "[resourceId('Microsoft.Network/routeTables',variables('hubRouteTable'))]"
                     },
                     "spokeRouteTableId": {
-                        "value":  "[reference(resourceId('Microsoft.Network/routeTables',variables('spokeRouteTable')))]"
+                        "value": "[resourceId('Microsoft.Network/routeTables',variables('spokeRouteTable'))]"
                     },
                     "spokeVnetName": {
                         "value": "[variables('spokeVnetName')]"
