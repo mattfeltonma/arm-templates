@@ -846,6 +846,60 @@
             "resources": [
             ]
         },
+        /* Assign Route Tables to appropriate subnets */
+        {
+            "name": "routeAssignment",
+            "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "[concat('Microsoft.Network/routeTables/', variables('hubRouteTable'))]",   
+                "[concat('Microsoft.Network/routeTables/', variables('hubVNGRouteTable'))]",
+                "[concat('Microsoft.Network/routeTables/', variables('spokeRouteTable'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "name": "[concat(variables('hubVnetName'),'/GatewaySubnet')]",
+                            "type": "Microsoft.Network/virtualNetwork/subnets",
+                            "apiVersion": "[variables('netApiVersionNum')]",
+                            "properties": {
+                                "routeTable": {
+                                    "id": "[reference(resourceId('Microsoft.Network/routeTables',variables('hubVNGRouteTable')))]"
+                                }
+                            }
+                        },
+                        {
+                            "name": "[concat(variables('hubVnetName'),'/',variables('primarySubnetName'))]",
+                            "type": "Microsoft.Network/virtualNetwork/subnets",
+                            "apiVersion": "[variables('netApiVersionNum')]",
+                            "properties": {
+                                "routeTable": {
+                                    "id": "[reference(resourceId('Microsoft.Network/routeTables',variables('hubRouteTable')))]"
+                                }
+                            }
+                        },
+                        {
+                            "name": "[concat(variables('spokeVnetName'),copyIndex(1),'/',variables('appSubnetName'),copyIndex(1))]",
+                            "type": "Microsoft.Network/virtualNetwork/subnets",
+                            "apiVersion": "[variables('netApiVersionNum')]",
+                            "properties": {
+                                "routeTable": {
+                                    "id": "[reference(resourceId('Microsoft.Network/routeTables',variables('spokeRouteTable')))]"
+                                }
+                            },
+                            "copy": {
+                                "name": "spokerouteassign",
+                                "count": "[length(variables('spokeCidrs'))]"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
         /* Deploy a VM into the primary subnet in the hub Virtual Network */
         {
             "name": "vm-hub-prim",
@@ -855,7 +909,8 @@
                 "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]",
                 "[concat('Microsoft.Network/routeTables/', variables('hubRouteTable'))]",  
                 "[concat('Microsoft.Network/azureFirewalls/', variables('azureFirewallName'))]",              
-                "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]"
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]",
+                "Microsoft.Resources/deployments/routeAssignment"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -905,7 +960,8 @@
                 "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]",
                 "[concat('Microsoft.Network/routeTables/', variables('hubRouteTable'))]",
                 "[concat('Microsoft.Network/azureFirewalls/', variables('azureFirewallName'))]",
-                "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]"
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]",
+                "Microsoft.Resources/deployments/routeAssignment"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -961,7 +1017,8 @@
                 "[concat('Microsoft.Network/connections/', variables('hubVngConnName'))]",
                 "[concat('Microsoft.Network/routeTables/', variables('hubVNGRouteTable'))]",                
                 "[concat('Microsoft.Network/azureFirewalls/', variables('azureFirewallName'))]",
-                "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]"
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]",
+                "Microsoft.Resources/deployments/routeAssignment"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -1013,7 +1070,8 @@
                 "[concat(concat('Microsoft.Network/routeTables/',variables('hubRouteTable')),'/routes/',concat('udr-spoke',copyIndex(1)))]",
                 "[concat('Microsoft.Network/routeTables/',variables('spokeRouteTable'))]",
                 "[concat('Microsoft.Network/azureFirewalls/', variables('azureFirewallName'))]",
-                "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]"
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]",
+                "Microsoft.Resources/deployments/routeAssignment"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -1055,7 +1113,7 @@
             },
             "copy": {
                 "name": "vmspokeapp",
-                "count": 2
+                "count": "[length(variables('spokeCidrs'))]"
             }
         }
     ]
