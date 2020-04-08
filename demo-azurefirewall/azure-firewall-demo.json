@@ -1168,12 +1168,12 @@
             "dependsOn": [
                 "[concat('Microsoft.Network/virtualNetworks/', variables('spokeVnetName'), copyIndex(1))]",
                 "[concat(concat('Microsoft.Network/virtualNetworks/', variables('spokeVnetName'), copyIndex(1)),'/virtualNetworkPeerings/',variables('spokeToHubPeeringName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/',variables('hubVnetName'),'/virtualNetworkPeerings/',variables('hubToSpokePeeringName'),copyIndex(1))]",
                 "[concat(concat('Microsoft.Network/routeTables/',variables('hubRouteTable')),'/routes/',concat('udr-spoke',copyIndex(1)))]",
                 "[concat('Microsoft.Network/routeTables/',variables('spokeRouteTable'))]",
                 "[concat('Microsoft.Network/azureFirewalls/', variables('azureFirewallName'))]",
                 "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]",
-                "[concat('Microsoft.Network/virtualNetworks/',variables('hubVnetName'),'/virtualNetworkPeerings/',variables('hubToSpokePeeringName'),copyIndex(1))]",
-                "[concat('Microsoft.Network/virtualNetworks/',variables('spokeVnetName'),copyIndex(1),'/virtualNetworkPeerings/',variables('spokeToHubPeeringName'),copyIndex(1))]"
+                "[concat('Microsoft.Network/virtualNetworks/',variables('hubVnetName'),'/virtualNetworkPeerings/',variables('hubToSpokePeeringName'),copyIndex(1))]"
             ],
             "properties": {
                 "mode": "Incremental",
