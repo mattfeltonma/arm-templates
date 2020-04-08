@@ -10,7 +10,7 @@
         },
         "vnetSubscriptionId": {
             "type": "string",
-            "defaultValue": "[subscription().id]",
+            "defaultValue": "[subscription().subscriptionId]",
             "metadata": {
                 "description": "The subscription of the Virtual Network the VM will use"
             }
