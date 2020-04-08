@@ -11,13 +11,13 @@
         "vmAdminUsername": {
             "type": "string",
             "metadata": {
-                "description": "Administrator name for VMs that are created"              
+                "description": "Administrator name for VMs that are created"
             }
         },
         "vmAdminPassword": {
             "type": "securestring",
             "metadata": {
-                "description": "Password for the VMs that are created"              
+                "description": "Password for the VMs that are created"
             }
         }
     },
@@ -84,7 +84,7 @@
             "type": "Microsoft.OperationalInsights/workspaces",
             "apiVersion": "[variables('laApiVersion')]",
             "location": "[variables('location')]",
-            "tags":"[parameters('tagValues')]",
+            "tags": "[parameters('tagValues')]",
             "properties": {
                 "sku": {
                     "name": "PerGB2018"
@@ -100,7 +100,7 @@
             "name": "[variables('hubVnetName')]",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags":"[parameters('tagValues')]",
+            "tags": "[parameters('tagValues')]",
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
@@ -156,7 +156,7 @@
             "name": "[variables('onPremVnetName')]",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags":"[parameters('tagValues')]",
+            "tags": "[parameters('tagValues')]",
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
@@ -188,7 +188,7 @@
             "name": "[concat(variables('spokeVnetName'),copyIndex(1))]",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags":"[parameters('tagValues')]",
+            "tags": "[parameters('tagValues')]",
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
@@ -224,7 +224,7 @@
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags":"[parameters('tagValues')]",
+            "tags": "[parameters('tagValues')]",
             "properties": {
                 "publicIpAllocationMethod": "Dynamic"
             },
@@ -238,7 +238,7 @@
             "type": "Microsoft.Network/virtualNetworkGateways",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags":"[parameters('tagValues')]",
+            "tags": "[parameters('tagValues')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/publicIPAddresses/', variables('hubVngPublicIpName'))]",
                 "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]"
@@ -273,7 +273,7 @@
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags":"[parameters('tagValues')]",
+            "tags": "[parameters('tagValues')]",
             "properties": {
                 "publicIpAllocationMethod": "Dynamic"
             },
@@ -287,7 +287,7 @@
             "type": "Microsoft.Network/virtualNetworkGateways",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags":"[parameters('tagValues')]",
+            "tags": "[parameters('tagValues')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/publicIPAddresses/', variables('onPremVngPublicIpName'))]",
                 "[concat('Microsoft.Network/virtualNetworks/', variables('onPremVnetName'))]"
@@ -322,7 +322,7 @@
             "type": "Microsoft.Network/connections",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags":"[parameters('tagValues')]",
+            "tags": "[parameters('tagValues')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/virtualNetworkGateways/', variables('hubVngName'))]",
                 "[concat('Microsoft.Network/virtualNetworkGateways/', variables('onPremVngName'))]"
@@ -353,7 +353,7 @@
             "type": "Microsoft.Network/connections",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags":"[parameters('tagValues')]",
+            "tags": "[parameters('tagValues')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/virtualNetworkGateways/', variables('hubVngName'))]",
                 "[concat('Microsoft.Network/virtualNetworkGateways/', variables('onPremVngName'))]"
@@ -434,7 +434,7 @@
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags":"[parameters('tagValues')]",
+            "tags": "[parameters('tagValues')]",
             "properties": {
                 "publicIpAllocationMethod": "Static"
             },
@@ -452,7 +452,7 @@
                 "[concat('Microsoft.Network/publicIpAddresses/', variables('bastionPublicIpName'))]",
                 "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]"
             ],
-            "tags":"[parameters('tagValues')]",
+            "tags": "[parameters('tagValues')]",
             "properties": {
                 "ipConfigurations": [
                     {
@@ -476,7 +476,7 @@
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags":"[parameters('tagValues')]",
+            "tags": "[parameters('tagValues')]",
             "properties": {
                 "publicIpAllocationMethod": "Static"
             },
@@ -490,7 +490,7 @@
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags":"[parameters('tagValues')]",
+            "tags": "[parameters('tagValues')]",
             "properties": {
                 "publicIpAllocationMethod": "Static"
             },
@@ -504,7 +504,7 @@
             "type": "Microsoft.Network/azureFirewalls",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags":"[parameters('tagValues')]",
+            "tags": "[parameters('tagValues')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/publicIpAddresses/', variables('azFirewallPublicIpName'))]",
                 "[concat('Microsoft.Network/publicIpAddresses/', variables('azFirewallMgmtPublicIpName'))]"
@@ -543,7 +543,7 @@
                                         "TCP"
                                     ],
                                     "sourceAddresses": [
-                                        "[variables('hubPrimarySubnetCidr')]"                                        
+                                        "[variables('hubPrimarySubnetCidr')]"
                                     ],
                                     "destinationAddresses": [
                                         "[variables('hubSecondarySubnetCidr')]"
@@ -558,7 +558,7 @@
                                         "TCP"
                                     ],
                                     "sourceAddresses": [
-                                        "[variables('hubPrimarySubnetCidr')]"                                        
+                                        "[variables('hubPrimarySubnetCidr')]"
                                     ],
                                     "destinationAddresses": [
                                         "[variables('appSubnetCidrs')[0]]",
@@ -574,7 +574,7 @@
                                         "TCP"
                                     ],
                                     "sourceAddresses": [
-                                        "[variables('appSubnetCidrs')[0]]"                                        
+                                        "[variables('appSubnetCidrs')[0]]"
                                     ],
                                     "destinationAddresses": [
                                         "[variables('dataSubnetCidrs')[0]]"
@@ -589,7 +589,7 @@
                                         "TCP"
                                     ],
                                     "sourceAddresses": [
-                                        "[variables('appSubnetCidrs')[0]]"                                        
+                                        "[variables('appSubnetCidrs')[0]]"
                                     ],
                                     "destinationAddresses": [
                                         "[variables('appSubnetCidrs')[1]]"
@@ -670,7 +670,7 @@
             "type": "Microsoft.Network/azureFirewalls/providers/diagnosticSettings",
             "apiVersion": "[variables('diagApiVersion')]",
             "location": "[variables('location')]",
-            "tags":"[parameters('tagValues')]",
+            "tags": "[parameters('tagValues')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/azureFirewalls/',variables('azureFirewallName'))]"
             ],
@@ -703,7 +703,7 @@
             "type": "Microsoft.Network/routeTables",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags":"[parameters('tagValues')]",
+            "tags": "[parameters('tagValues')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/azureFirewalls/',variables('azureFirewallName'))]"
             ],
@@ -729,7 +729,7 @@
             "type": "Microsoft.Network/routeTables",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags":"[parameters('tagValues')]",
+            "tags": "[parameters('tagValues')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/azureFirewalls/',variables('azureFirewallName'))]"
             ],
@@ -818,7 +818,7 @@
             "type": "Microsoft.Network/routeTables",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags":"[parameters('tagValues')]",
+            "tags": "[parameters('tagValues')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/azureFirewalls/',variables('azureFirewallName'))]"
             ],
@@ -852,7 +852,7 @@
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "type": "Microsoft.Resources/deployments",
             "dependsOn": [
-                "[concat('Microsoft.Network/routeTables/', variables('hubRouteTable'))]",   
+                "[concat('Microsoft.Network/routeTables/', variables('hubRouteTable'))]",
                 "[concat('Microsoft.Network/routeTables/', variables('hubVNGRouteTable'))]",
                 "[concat('Microsoft.Network/routeTables/', variables('spokeRouteTable'))]"
             ],
@@ -865,8 +865,7 @@
                     "netApiVersionNum": {
                         "value": "[variables('netApiVersionNum')]"
                     },
-                    "hubGatewaySubnetRouteTableId":
-                    {
+                    "hubGatewaySubnetRouteTableId": {
                         "value": "[resourceId('Microsoft.Network/routeTables',variables('hubVNGRouteTable'))]"
                     },
                     "hubRouteTableId": {
@@ -877,6 +876,15 @@
                     },
                     "hubVnetName": {
                         "value": "[variables('hubVnetName')]"
+                    },
+                    "hubGatewaySubnetCidr": {
+                        "value": "[variables('hubGatewaySubnetCidr')]"
+                    },
+                    "hubPrimarySubnetCidr": {
+                        "value": "[variables('hubPrimarySubnetCidr')]"
+                    },
+                    "hubSecondarySubnetCidr": {
+                        "value": "[variables('hubSecondarySubnetCidr')]"
                     },
                     "primarySubnetName": {
                         "value": "[variables('primarySubnetName')]"
@@ -892,6 +900,9 @@
                     },
                     "spokeCidrs": {
                         "value": "[variables('spokeCidrs')]"
+                    },
+                    "appSubnetCidrs": {
+                        "value": "[variables('appSubnetCidrs')]"
                     }
                 },
                 "template": {
@@ -902,6 +913,15 @@
                             "type": "string"
                         },
                         "hubVnetName": {
+                            "type": "string"
+                        },
+                        "hubGatewaySubnetCidr": {
+                            "type": "string"
+                        },
+                        "hubPrimarySubnetCidr": {
+                            "type": "string"
+                        },
+                        "hubSecondarySubnetCidr": {
                             "type": "string"
                         },
                         "primarySubnetName": {
@@ -927,6 +947,9 @@
                         },
                         "spokeCidrs": {
                             "type": "array"
+                        },
+                        "appSubnetCidrs": {
+                            "type": "array"
                         }
                     },
                     "resources": [
@@ -935,6 +958,7 @@
                             "type": "Microsoft.Network/virtualNetworks/subnets",
                             "apiVersion": "[parameters('netApiVersionNum')]",
                             "properties": {
+                                "addressPrefix": "[parameters('hubGatewaySubnetCidr')]",
                                 "routeTable": {
                                     "id": "[parameters('hubGatewaySubnetRouteTableId')]"
                                 }
@@ -945,6 +969,7 @@
                             "type": "Microsoft.Network/virtualNetworks/subnets",
                             "apiVersion": "[parameters('netApiVersionNum')]",
                             "properties": {
+                                "addressPrefix": "[parameters('hubPrimarySubnetCidr')]",
                                 "routeTable": {
                                     "id": "[parameters('hubRouteTableId')]"
                                 }
@@ -955,6 +980,7 @@
                             "type": "Microsoft.Network/virtualNetworks/subnets",
                             "apiVersion": "[parameters('netApiVersionNum')]",
                             "properties": {
+                                "addressPrefix": "[parameters('hubSecondarySubnetCidr')]",
                                 "routeTable": {
                                     "id": "[parameters('hubRouteTableId')]"
                                 }
@@ -965,6 +991,7 @@
                             "type": "Microsoft.Network/virtualNetworks/subnets",
                             "apiVersion": "[parameters('netApiVersionNum')]",
                             "properties": {
+                                "addressPrefix": "[parameters('appSubnetCidrs')[copyIndex()]]",
                                 "routeTable": {
                                     "id": "[parameters('spokeRouteTableId')]"
                                 }
@@ -985,8 +1012,8 @@
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]",
-                "[concat('Microsoft.Network/routeTables/', variables('hubRouteTable'))]",  
-                "[concat('Microsoft.Network/azureFirewalls/', variables('azureFirewallName'))]",              
+                "[concat('Microsoft.Network/routeTables/', variables('hubRouteTable'))]",
+                "[concat('Microsoft.Network/azureFirewalls/', variables('azureFirewallName'))]",
                 "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]",
                 "Microsoft.Resources/deployments/routeAssignment"
             ],
@@ -1014,12 +1041,10 @@
                     "adminPassword": {
                         "value": "[parameters('vmAdminPassword')]"
                     },
-                    "myWorkspaceId":
-                    {
+                    "myWorkspaceId": {
                         "value": "[reference(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-03-20').customerId]"
                     },
-                    "myWorkspaceKey":
-                    {
+                    "myWorkspaceKey": {
                         "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-03-20').primarySharedKey]"
                     }
                 },
@@ -1065,12 +1090,10 @@
                     "adminPassword": {
                         "value": "[parameters('vmAdminPassword')]"
                     },
-                    "myWorkspaceId":
-                    {
+                    "myWorkspaceId": {
                         "value": "[reference(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-03-20').customerId]"
                     },
-                    "myWorkspaceKey":
-                    {
+                    "myWorkspaceKey": {
                         "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-03-20').primarySharedKey]"
                     }
                 },
@@ -1093,7 +1116,7 @@
                 "[concat('Microsoft.Network/virtualNetworks/', variables('onPremVnetName'))]",
                 "[concat('Microsoft.Network/connections/', variables('onpremVngConnName'))]",
                 "[concat('Microsoft.Network/connections/', variables('hubVngConnName'))]",
-                "[concat('Microsoft.Network/routeTables/', variables('hubVNGRouteTable'))]",                
+                "[concat('Microsoft.Network/routeTables/', variables('hubVNGRouteTable'))]",
                 "[concat('Microsoft.Network/azureFirewalls/', variables('azureFirewallName'))]",
                 "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]",
                 "Microsoft.Resources/deployments/routeAssignment"
@@ -1122,12 +1145,10 @@
                     "adminPassword": {
                         "value": "[parameters('vmAdminPassword')]"
                     },
-                    "myWorkspaceId":
-                    {
+                    "myWorkspaceId": {
                         "value": "[reference(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-03-20').customerId]"
                     },
-                    "myWorkspaceKey":
-                    {
+                    "myWorkspaceKey": {
                         "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-03-20').primarySharedKey]"
                     }
                 },
@@ -1175,12 +1196,10 @@
                     "adminPassword": {
                         "value": "[parameters('vmAdminPassword')]"
                     },
-                    "myWorkspaceId":
-                    {
+                    "myWorkspaceId": {
                         "value": "[reference(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-03-20').customerId]"
                     },
-                    "myWorkspaceKey":
-                    {
+                    "myWorkspaceKey": {
                         "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-03-20').primarySharedKey]"
                     }
                 },
