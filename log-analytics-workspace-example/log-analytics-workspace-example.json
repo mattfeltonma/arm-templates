@@ -1,0 +1,49 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspaceName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the log analytics workspace"
+            }
+        },
+        "retentionPeriod": {
+            "type": "int",
+            "defaultValue": 60,
+            "metadata": {
+                "description": "The retention period in days"
+            }
+        }
+    },
+    "variables": {
+        "location": "[resourceGroup().location]",
+        "insightsApiVersion": "2015-11-01-preview"
+    },
+    "resources": [
+        {
+            "name": "[parameters('workspaceName')]",
+            "type": "Microsoft.OperationalInsights/workspaces",
+            "apiVersion": "[variables('insightsApiVersion')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "sku": {
+                    "name": "PerGB2018"
+                },
+                "retentionInDays": "[parameters('retentionPeriod')]"
+            },
+            "resources": [
+            ]
+        }
+    ],
+    "outputs": {
+        "workspaceId": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.OperationalInsights/workspaces',parameters('workspaceName')), '2015-03-20').customerId]"
+        },
+        "workspaceKey": {
+            "type": "string",
+            "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces',parameters('workspaceName')), '2015-03-20').primarySharedKey]"
+        }
+    }
+}
