@@ -858,42 +858,102 @@
             ],
             "properties": {
                 "mode": "Incremental",
+                "expressionEvaluationOptions": {
+                    "scope": "inner"
+                },
+                "parameters": {
+                    "netApiVersionNum": {
+                        "value": "[variables('netApiVersionNum')]"
+                    },
+                    "hubGatewaySubnetRouteTableId":
+                    {
+                        "value": "[reference(resourceId('Microsoft.Network/routeTables',variables('hubVNGRouteTable')))]"
+                    },
+                    "hubRouteTableId": {
+                        "value": "[reference(resourceId('Microsoft.Network/routeTables',variables('hubRouteTable')))]"
+                    },
+                    "spokeRouteTableId": {
+                        "value":  "[reference(resourceId('Microsoft.Network/routeTables',variables('spokeRouteTable')))]"
+                    },
+                    "spokeVnetName": {
+                        "value": "[variables('spokeVnetName')]"
+                    },
+                    "appSubnetName": {
+                        "value": "[variables('appSubnetName')]"
+                    },
+                    "spokeCidrs": {
+                        "value": "[variables('spokeCidrs')]"
+                    }
+                },
                 "template": {
                     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
                     "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "netApiVersionNum": {
+                            "type": "string"
+                        },
+                        "hubGatewaySubnetRouteTableId": {
+                            "type": "string"
+                        },
+                        "hubRouteTableId": {
+                            "type": "string"
+                        },
+                        "spokeRouteTableId": {
+                            "type": "string"
+                        },
+                        "spokeVnetName": {
+                            "type": "string"
+                        },
+                        "appSubnetName": {
+                            "type": "string"
+                        },
+                        "spokeCidrs": {
+                            "type": "array"
+                        }
+                    },
                     "resources": [
                         {
                             "name": "[concat(variables('hubVnetName'),'/GatewaySubnet')]",
                             "type": "Microsoft.Network/virtualNetwork/subnets",
-                            "apiVersion": "[variables('netApiVersionNum')]",
+                            "apiVersion": "[parameters('netApiVersionNum')]",
                             "properties": {
                                 "routeTable": {
-                                    "id": "[reference(resourceId('Microsoft.Network/routeTables',variables('hubVNGRouteTable')))]"
+                                    "id": "[parameters('hubGatewaySubnetRouteTableId')]"
                                 }
                             }
                         },
                         {
                             "name": "[concat(variables('hubVnetName'),'/',variables('primarySubnetName'))]",
                             "type": "Microsoft.Network/virtualNetwork/subnets",
-                            "apiVersion": "[variables('netApiVersionNum')]",
+                            "apiVersion": "[parameters('netApiVersionNum')]",
                             "properties": {
                                 "routeTable": {
-                                    "id": "[reference(resourceId('Microsoft.Network/routeTables',variables('hubRouteTable')))]"
+                                    "id": "[parameters('hubRouteTableId')]"
                                 }
                             }
                         },
                         {
-                            "name": "[concat(variables('spokeVnetName'),copyIndex(1),'/',variables('appSubnetName'),copyIndex(1))]",
+                            "name": "[concat(variables('hubVnetName'),'/',variables('SecondarySubnetName'))]",
                             "type": "Microsoft.Network/virtualNetwork/subnets",
-                            "apiVersion": "[variables('netApiVersionNum')]",
+                            "apiVersion": "[parameters('netApiVersionNum')]",
                             "properties": {
                                 "routeTable": {
-                                    "id": "[reference(resourceId('Microsoft.Network/routeTables',variables('spokeRouteTable')))]"
+                                    "id": "[parameters('hubRouteTableId')]"
+                                }
+                            }
+                        },
+                        {
+                            "name": "[concat(parameters('spokeVnetName'),copyIndex(1),'/',parameters('appSubnetName'),copyIndex(1))]",
+                            "type": "Microsoft.Network/virtualNetwork/subnets",
+                            "apiVersion": "[parameters('netApiVersionNum')]",
+                            "properties": {
+                                "routeTable": {
+                                    "id": "[parameters('spokeRouteTableId')]"
                                 }
                             },
                             "copy": {
                                 "name": "spokerouteassign",
-                                "count": "[length(variables('spokeCidrs'))]"
+                                "count": "[length(parameters('spokeCidrs'))]"
                             }
                         }
                     ]
