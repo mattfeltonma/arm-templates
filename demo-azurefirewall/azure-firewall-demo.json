@@ -577,7 +577,7 @@
                                         "[variables('spokeCidrs')[1]]"
                                     ],
                                     "destinationAddresses": [
-                                        "[variables('onpremCidr')[0]]"
+                                        "[variables('onpremCidr')]"
                                     ],
                                     "destinationPorts": [
                                         "3389"
