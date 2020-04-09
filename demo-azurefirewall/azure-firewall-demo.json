@@ -393,34 +393,6 @@
                 "name": "Standard"
             }
         },
-        /* Create an Azure Bastion instance in the hub Virtual Network */
-        {
-            "name": "[variables('bastionName')]",
-            "type": "Microsoft.Network/bastionHosts",
-            "apiVersion": "[variables('netApiVersionNum')]",
-            "location": "[variables('location')]",
-            "dependsOn": [
-                "[concat('Microsoft.Network/publicIpAddresses/', variables('bastionPublicIpName'))]",
-                "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]"
-            ],
-            "tags": "[parameters('tagValues')]",
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "bastionConfig",
-                        "properties": {
-                            "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('bastionSubnetName'))]"
-                            },
-                            "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIpAddresses', variables('bastionPublicIpName'))]"
-                            },
-                            "privateIPAllocationMethod": "Dynamic"
-                        }
-                    }
-                ]
-            }
-        },
         /* Create a Public IP for the Azure Firewall instance */
         {
             "name": "[variables('azFirewallPublicIpName')]",
@@ -1341,6 +1313,36 @@
             "copy": {
                 "name": "vmspokedata",
                 "count": 1
+            }
+        },
+        /* Create an Azure Bastion instance in the hub Virtual Network */
+        {
+            "name": "[variables('bastionName')]",
+            "type": "Microsoft.Network/bastionHosts",
+            "apiVersion": "[variables('netApiVersionNum')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIpAddresses/', variables('bastionPublicIpName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]",
+                "Microsoft.Resources/deployments/vm-hub-prim",
+                "Microsoft.Resources/deployments/vm-hub-sec"                
+            ],
+            "tags": "[parameters('tagValues')]",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "bastionConfig",
+                        "properties": {
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('bastionSubnetName'))]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIpAddresses', variables('bastionPublicIpName'))]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic"
+                        }
+                    }
+                ]
             }
         }
     ]
