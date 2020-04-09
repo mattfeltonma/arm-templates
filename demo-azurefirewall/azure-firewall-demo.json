@@ -837,6 +837,7 @@
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "type": "Microsoft.Resources/deployments",
             "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworkGateways/', variables('hubVngName'))]",
                 "[concat('Microsoft.Network/routeTables/', variables('hubRouteTable'))]",
                 "[concat('Microsoft.Network/routeTables/', variables('hubVNGRouteTable'))]",
                 "[concat('Microsoft.Network/routeTables/', variables('spokeRouteTable'))]"
