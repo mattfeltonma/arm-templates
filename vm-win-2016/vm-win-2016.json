@@ -142,7 +142,8 @@
                 "[parameters('availabilityZone')]"
             ],
             "dependsOn": [
-                "[concat('Microsoft.Storage/storageAccounts/', variables('diagAcctName'))]"
+                "[concat('Microsoft.Storage/storageAccounts/', variables('diagAcctName'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
             ],
             "properties": {
                 "hardwareProfile": {
