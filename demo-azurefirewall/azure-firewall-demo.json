@@ -833,7 +833,7 @@
         },
         /* Assign Route Tables to first set */
         {
-            "name": "routeAssignmentStage1",
+            "name": "routeAssignment",
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "type": "Microsoft.Resources/deployments",
             "dependsOn": [
