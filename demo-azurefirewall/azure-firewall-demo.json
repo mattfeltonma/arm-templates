@@ -574,7 +574,7 @@
                                     "sourceAddresses": [
                                         "[variables('hubCidr')]",
                                         "[variables('spokeCidrs')[0]]",
-                                        "[variables('spokeCidrs')[1]]",
+                                        "[variables('spokeCidrs')[1]]"
                                     ],
                                     "destinationAddresses": [
                                         "[variables('onpremCidr')[0]]"
