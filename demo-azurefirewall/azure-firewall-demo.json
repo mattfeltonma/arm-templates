@@ -213,7 +213,7 @@
             },
             "copy": {
                 "name": "spokevnets",
-                "count": 2
+                "count": "[length(variables('spokeCidrs'))]"
             },
             "resources": [
             ]
