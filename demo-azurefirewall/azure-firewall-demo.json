@@ -213,7 +213,7 @@
             },
             "copy": {
                 "name": "spokevnets",
-                "count": "[length(variables('spokeCidrs'))]"
+                "count": 2
             },
             "resources": [
             ]
@@ -466,7 +466,7 @@
             "properties": {
                 "networkRuleCollections": [
                     {
-                        "name": "RdpRc1",
+                        "name": "RdpHubVnet",
                         "properties": {
                             "priority": 100,
                             "action": {
@@ -548,6 +548,40 @@
                                     "destinationPorts": [
                                         "3389"
                                     ]
+                                },
+                                {
+                                    "name": "RdpOnpremAzure",
+                                    "protocols": [
+                                        "TCP"
+                                    ],
+                                    "sourceAddresses": [
+                                        "[variables('onpremCidr')[0]]"
+                                    ],
+                                    "destinationAddresses": [
+                                        "[variables('hubCidr')]",
+                                        "[variables('spokeCidrs')[0]]",
+                                        "[variables('spokeCidrs')[1]]"
+                                    ],
+                                    "destinationPorts": [
+                                        "3389"
+                                    ]
+                                },
+                                {
+                                    "name": "RdpAzureOnprem",
+                                    "protocols": [
+                                        "TCP"
+                                    ],
+                                    "sourceAddresses": [
+                                        "[variables('hubCidr')]",
+                                        "[variables('spokeCidrs')[0]]",
+                                        "[variables('spokeCidrs')[1]]",
+                                    ],
+                                    "destinationAddresses": [
+                                        "[variables('onpremCidr')[0]]"
+                                    ],
+                                    "destinationPorts": [
+                                        "3389"
+                                    ]
                                 }
                             ]
                         }
@@ -614,7 +648,7 @@
                     "tier": "Standard"
                 }
             }
-        },
+        },      
         /* Configure the diagnostic settings for Azure Firewall to write the Log Analytics Workspace */
         {
             "name": "[concat(variables('azureFirewallName'),'/microsoft.insights/diag')]",
@@ -849,11 +883,17 @@
                     "appSubnetName": {
                         "value": "[variables('appSubnetName')]"
                     },
+                    "dataSubnetName": {
+                        "value": "[variables('dataSubnetName')]"
+                    },
                     "spokeCidrs": {
                         "value": "[variables('spokeCidrs')]"
                     },
                     "appSubnetCidrs": {
                         "value": "[variables('appSubnetCidrs')]"
+                    },
+                    "dataSubnetCidrs": {
+                        "value": "[variables('dataSubnetCidrs')]"
                     }
                 },
                 "template": {
@@ -896,10 +936,16 @@
                         "appSubnetName": {
                             "type": "string"
                         },
+                        "dataSubnetName": {
+                            "type": "string"
+                        },
                         "spokeCidrs": {
                             "type": "array"
                         },
                         "appSubnetCidrs": {
+                            "type": "array"
+                        },
+                        "dataSubnetCidrs": {
                             "type": "array"
                         }
                     },
@@ -943,6 +989,21 @@
                             "apiVersion": "[parameters('netApiVersionNum')]",
                             "properties": {
                                 "addressPrefix": "[parameters('appSubnetCidrs')[copyIndex()]]",
+                                "routeTable": {
+                                    "id": "[parameters('spokeRouteTableId')]"
+                                }
+                            },
+                            "copy": {
+                                "name": "spokerouteassign",
+                                "count": "[length(parameters('spokeCidrs'))]"
+                            }
+                        },
+                        {
+                            "name": "[concat(parameters('spokeVnetName'),copyIndex(1),'/',parameters('dataSubnetName'),copyIndex(1))]",
+                            "type": "Microsoft.Network/virtualNetworks/subnets",
+                            "apiVersion": "[parameters('netApiVersionNum')]",
+                            "properties": {
+                                "addressPrefix": "[parameters('dataSubnetCidrs')[copyIndex()]]",
                                 "routeTable": {
                                     "id": "[parameters('spokeRouteTableId')]"
                                 }
@@ -1214,6 +1275,62 @@
             "copy": {
                 "name": "vmspokeapp",
                 "count": "[length(variables('spokeCidrs'))]"
+            }
+        },
+        /* Deploy a VM into the data subnet in the first spoke Virtual Network */
+        {
+            "name": "[concat('vm-spoke-data',copyIndex(1))]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', variables('spokeVnetName'), copyIndex(1))]",
+                "[concat(concat('Microsoft.Network/virtualNetworks/', variables('spokeVnetName'), copyIndex(1)),'/virtualNetworkPeerings/',variables('spokeToHubPeeringName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/',variables('hubVnetName'),'/virtualNetworkPeerings/',variables('hubToSpokePeeringName'),copyIndex(1))]",
+                "[concat(concat('Microsoft.Network/routeTables/',variables('hubRouteTable')),'/routes/',concat('udr-spoke',copyIndex(1)))]",
+                "[concat('Microsoft.Network/routeTables/',variables('spokeRouteTable'))]",
+                "[concat('Microsoft.Network/azureFirewalls/', variables('azureFirewallName'))]",
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/',variables('hubVnetName'),'/virtualNetworkPeerings/',variables('hubToSpokePeeringName'),copyIndex(1))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {
+                    "tagValues": {
+                        "value": "[parameters('tagValues')]"
+                    },
+                    "vmName": {
+                        "value": "[concat('vmspoke',copyIndex(1),'app')]"
+                    },
+                    "vnetName": {
+                        "value": "[concat(variables('spokeVnetName'),copyIndex(1))]"
+                    },
+                    "subnetName": {
+                        "value": "[concat(variables('dataSubnetName'),copyIndex(1))]"
+                    },
+                    "virtualMachineSize": {
+                        "value": "[variables('vmSize')]"
+                    },
+                    "adminUserName": {
+                        "value": "[parameters('vmAdminUsername')]"
+                    },
+                    "adminPassword": {
+                        "value": "[parameters('vmAdminPassword')]"
+                    },
+                    "myWorkspaceId": {
+                        "value": "[reference(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-03-20').customerId]"
+                    },
+                    "myWorkspaceKey": {
+                        "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-03-20').primarySharedKey]"
+                    }
+                },
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/mattfeltonma/arm-templates/master/vm-win-2016/vm-win-2016.json",
+                    "contentVersion": "1.0.0.0"
+                }
+            },
+            "copy": {
+                "name": "vmspokedata",
+                "count": "1"
             }
         }
     ]
