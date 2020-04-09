@@ -1325,7 +1325,8 @@
                 "[concat('Microsoft.Network/publicIpAddresses/', variables('bastionPublicIpName'))]",
                 "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]",
                 "Microsoft.Resources/deployments/vm-hub-prim",
-                "Microsoft.Resources/deployments/vm-hub-sec"                
+                "Microsoft.Resources/deployments/vm-hub-sec1",
+                "Microsoft.Resources/deployments/vm-hub-sec2"                
             ],
             "tags": "[parameters('tagValues')]",
             "properties": {
