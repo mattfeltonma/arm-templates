@@ -555,7 +555,7 @@
                                         "TCP"
                                     ],
                                     "sourceAddresses": [
-                                        "[variables('onpremCidr')[0]]"
+                                        "[variables('onpremCidr')]"
                                     ],
                                     "destinationAddresses": [
                                         "[variables('hubCidr')]",
