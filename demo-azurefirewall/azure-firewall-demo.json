@@ -1052,7 +1052,7 @@
         },
         /* Deploy a VM into the primary subnet in the hub Virtual Network */
         {
-            "name": "vm-hub-prim",
+            "name": "vmhp01",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "dependsOn": [
@@ -1101,7 +1101,7 @@
         },
         /* Deploy two VMs into the secondary subnet in the hub Virtual Network */
         {
-            "name": "[concat('vm-hub-sec',copyIndex(1))]",
+            "name": "[concat('vmhs',copyIndex(1))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "dependsOn": [
@@ -1154,7 +1154,7 @@
         },
         /* Deploy a VM into the primary subnet in the on-premises Virtual Network */
         {
-            "name": "vm-onprem-hub",
+            "name": "vmop1",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "dependsOn": [
@@ -1205,7 +1205,7 @@
         },
         /* Deploy a VM into the app subnet in each spoke Virtual Network */
         {
-            "name": "[concat('vm-spoke-app',copyIndex(1))]",
+            "name": "[concat('vmsa',copyIndex(1))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "dependsOn": [
@@ -1262,7 +1262,7 @@
         },
         /* Deploy a VM into the data subnet in the first spoke Virtual Network */
         {
-            "name": "[concat('vm-spoke-data',copyIndex(1))]",
+            "name": "[concat('vmsd',copyIndex(1))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "dependsOn": [
