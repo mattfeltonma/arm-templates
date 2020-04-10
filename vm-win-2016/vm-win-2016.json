@@ -8,17 +8,6 @@
                 "description": "VM Name"
             }
         },
-        "networkWatcher": {
-            "type": "bool",
-            "defaultValue": "False",
-            "metadata": {
-                "description": "Install Network Watcher VM extension"
-            },
-            "allowedValues": [
-                "True",
-                "False"
-            ]
-        },
         "vnetSubscriptionId": {
             "type": "string",
             "defaultValue": "[subscription().subscriptionId]",
