@@ -1101,7 +1101,7 @@
         },
         /* Deploy two VMs into the secondary subnet in the hub Virtual Network */
         {
-            "name": "[concat('vmhs',copyIndex(1))]",
+            "name": "[concat('vmhs0',copyIndex(1))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "dependsOn": [
@@ -1154,7 +1154,7 @@
         },
         /* Deploy a VM into the primary subnet in the on-premises Virtual Network */
         {
-            "name": "vmop1",
+            "name": "vmop01",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "dependsOn": [
@@ -1205,7 +1205,7 @@
         },
         /* Deploy a VM into the app subnet in each spoke Virtual Network */
         {
-            "name": "[concat('vmsa',copyIndex(1))]",
+            "name": "[concat('vmsa0',copyIndex(1))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "dependsOn": [
@@ -1262,7 +1262,7 @@
         },
         /* Deploy a VM into the data subnet in the first spoke Virtual Network */
         {
-            "name": "[concat('vmsd',copyIndex(1))]",
+            "name": "[concat('vmsd0',copyIndex(1))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "dependsOn": [
@@ -1326,9 +1326,9 @@
             "dependsOn": [
                 "[concat('Microsoft.Network/publicIpAddresses/', variables('bastionPublicIpName'))]",
                 "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]",
-                "Microsoft.Resources/deployments/vm-hub-prim",
-                "Microsoft.Resources/deployments/vm-hub-sec1",
-                "Microsoft.Resources/deployments/vm-hub-sec2"                
+                "Microsoft.Resources/deployments/vmhp01",
+                "Microsoft.Resources/deployments/vmhs01",
+                "Microsoft.Resources/deployments/vmhs02"       
             ],
             "tags": "[parameters('tagValues')]",
             "properties": {
