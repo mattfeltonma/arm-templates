@@ -213,7 +213,7 @@
         },
         /* Install Network Watcher VM extension */
         {
-            "name": "[concat('networkwatcher',parameters('vmName'))]",
+            "name": "[concat('nw',parameters('vmName'))]",
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
