@@ -216,8 +216,7 @@
                     "apiVersion": "[variables('vmApiVersion')]",
                     "location": "[variables('location')]",
                     "dependsOn": [
-                        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]",
-                        "extensions/Microsoft.Azure.NetworkWatcher" 
+                        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
                     ],
                     "properties": {
                         "publisher": "Microsoft.Azure.NetworkWatcher",
