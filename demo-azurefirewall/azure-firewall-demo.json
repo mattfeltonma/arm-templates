@@ -803,7 +803,7 @@
             "resources": [
             ]
         },
-        /* Assign Route Tables to first set */
+        /* Assign Route Tables to the appropriate subnets */
         {
             "name": "routeAssignment",
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
@@ -1258,63 +1258,6 @@
             "copy": {
                 "name": "vmspokeapp",
                 "count": "[length(variables('spokeCidrs'))]"
-            }
-        },
-        /* Deploy a VM into the data subnet in the first spoke Virtual Network */
-        {
-            "name": "[concat('vmsd0',copyIndex(1))]",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
-            "dependsOn": [
-                "[concat('Microsoft.Network/virtualNetworks/', variables('spokeVnetName'), copyIndex(1))]",
-                "[concat(concat('Microsoft.Network/virtualNetworks/', variables('spokeVnetName'), copyIndex(1)),'/virtualNetworkPeerings/',variables('spokeToHubPeeringName'))]",
-                "[concat('Microsoft.Network/virtualNetworks/',variables('hubVnetName'),'/virtualNetworkPeerings/',variables('hubToSpokePeeringName'),copyIndex(1))]",
-                "[concat(concat('Microsoft.Network/routeTables/',variables('hubRouteTable')),'/routes/',concat('udr-spoke',copyIndex(1)))]",
-                "[concat('Microsoft.Network/routeTables/',variables('spokeRouteTable'))]",
-                "[concat('Microsoft.Network/azureFirewalls/', variables('azureFirewallName'))]",
-                "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]",
-                "[concat('Microsoft.Network/virtualNetworks/',variables('hubVnetName'),'/virtualNetworkPeerings/',variables('hubToSpokePeeringName'),copyIndex(1))]",
-                "Microsoft.Resources/deployments/routeAssignment"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "parameters": {
-                    "tagValues": {
-                        "value": "[parameters('tagValues')]"
-                    },
-                    "vmName": {
-                        "value": "[concat('vmspoke',copyIndex(1),'app')]"
-                    },
-                    "vnetName": {
-                        "value": "[concat(variables('spokeVnetName'),copyIndex(1))]"
-                    },
-                    "subnetName": {
-                        "value": "[concat(variables('dataSubnetName'),copyIndex(1))]"
-                    },
-                    "virtualMachineSize": {
-                        "value": "[variables('vmSize')]"
-                    },
-                    "adminUserName": {
-                        "value": "[parameters('vmAdminUsername')]"
-                    },
-                    "adminPassword": {
-                        "value": "[parameters('vmAdminPassword')]"
-                    },
-                    "myWorkspaceId": {
-                        "value": "[reference(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-03-20').customerId]"
-                    },
-                    "myWorkspaceKey": {
-                        "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces',variables('laWorkspaceName')), '2015-03-20').primarySharedKey]"
-                    }
-                },
-                "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/mattfeltonma/arm-templates/master/vm-win-2016/vm-win-2016.json",
-                    "contentVersion": "1.0.0.0"
-                }
-            },
-            "copy": {
-                "name": "vmspokedata",
-                "count": 1
             }
         },
         /* Create an Azure Bastion instance in the hub Virtual Network */

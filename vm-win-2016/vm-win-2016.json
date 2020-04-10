@@ -8,6 +8,17 @@
                 "description": "VM Name"
             }
         },
+        "networkWatcher": {
+            "type": "bool",
+            "defaultValue": "False",
+            "metadata": {
+                "description": "Install Network Watcher VM extension"
+            },
+            "allowedValues": [
+                "True",
+                "False"
+            ]
+        },
         "vnetSubscriptionId": {
             "type": "string",
             "defaultValue": "[subscription().subscriptionId]",
@@ -53,13 +64,13 @@
             }
         },
         "myWorkspaceId": {
-            "type":"string",
+            "type": "string",
             "metadata": {
                 "description": "The Log and Analytics workspace ID that the Microsoft Monitoring Agent will deliver metrics and logs to"
             }
         },
         "myWorkspaceKey": {
-            "type":"string",
+            "type": "string",
             "metadata": {
                 "description": "The Log and Analytics workspace secret"
             }
@@ -70,7 +81,7 @@
             "metadata": {
                 "description": "The availability zone number you want to place the VM into"
             },
-            "allowedValues":[
+            "allowedValues": [
                 1,
                 2,
                 3
@@ -88,7 +99,7 @@
         "vmApiVersion": "2019-07-01",
         "storageApiVersion": "2019-06-01",
         "resourceDeploymentsApiVersion": "2019-10-01",
-        "location":"[resourceGroup().location]",
+        "location": "[resourceGroup().location]",
         "diagAcctName": "[concat('st',uniqueString(parameters('myWorkspaceId')))]",
         "nicName": "[concat(parameters('vmName'),uniqueString(resourceGroup().id))]",
         "subnetRef": "[resourceId(parameters('vnetSubscriptionId'),parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks/subnets',parameters('vnetName'),parameters('subnetName'))]"
@@ -100,16 +111,17 @@
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "[variables('storageApiVersion')]",
             "sku": {
-              "name": "Standard_LRS"
+                "name": "Standard_LRS"
             },
             "kind": "StorageV2",
             "location": "[variables('location')]",
             "tags": "[parameters('tagValues')]",
             "properties": {
-              "accessTier": "Hot",
-              "supportsHttpsTrafficOnly": true
+                "accessTier": "Hot",
+                "supportsHttpsTrafficOnly": true
             },
-            "resources": []
+            "resources": [
+            ]
         },
         /* Create network interface */
         {
@@ -208,30 +220,22 @@
                             "workspaceKey": "[parameters('myWorkspaceKey')]"
                         }
                     }
-                }
-            ]
-        },
-        /* Install Network Watcher VM extension */
-        {
-            "name": "[concat('nw',parameters('vmName'))]",
-            "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
-            "type": "Microsoft.Resources/deployments",
-            "properties": {
-                "mode": "incremental",
-                "templateLink": {
-                    "uri": "https://gallery.azure.com/artifact/20161101/microsoft.network-watcher-windows-arm.1.4.14/Artifacts/MainTemplate.json"
                 },
-                "parameters": {
-                    "vmName": {
-                        "value": "[parameters('vmName')]"
-                    },
-                    "location": {
-                        "value": "[variables('location')]"
+                {
+                    "type": "extensions",
+                    "name": "Microsoft.Azure.NetworkWatcher",
+                    "apiVersion": "[variables('vmApiVersion')]",
+                    "location": "[variables('location')]",
+                    "dependsOn": [
+                        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"  
+                    ],
+                    "properties": {
+                        "publisher": "Microsoft.Azure.NetworkWatcher",
+                        "type": "NetworkWatcherAgentWindows",
+                        "typeHandlerVersion": "1.4",
+                        "autoUpgradeMinorVersion": true
                     }
                 }
-            },
-            "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
             ]
         }
     ]
