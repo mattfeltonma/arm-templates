@@ -61,7 +61,6 @@
         "spokeToHubPeeringName": "peerspoketohub",
         "bastionPublicIpName": "pip-bastion",
         "azFirewallPublicIpName": "pip-azfw",
-        "azFirewallMgmtPublicIpName": "pip-azfwmgmt",
         "hubVngPublicIpName": "pip-hubvng",
         "hubVngName": "vng-hub",
         "hubVngConnName": "conn-hubtoonprem",
@@ -407,20 +406,6 @@
                 "name": "Standard"
             }
         },
-        /* Create a Public IP for Azure Firewall Management to support forced tunneling */
-        {
-            "name": "[variables('azFirewallMgmtPublicIpName')]",
-            "type": "Microsoft.Network/publicIpAddresses",
-            "apiVersion": "[variables('netApiVersionNum')]",
-            "location": "[variables('location')]",
-            "tags": "[parameters('tagValues')]",
-            "properties": {
-                "publicIpAllocationMethod": "Static"
-            },
-            "sku": {
-                "name": "Standard"
-            }
-        },
         /* Create the Azure Firewall instance */
         {
             "name": "[variables('azureFirewallName')]",
@@ -429,8 +414,7 @@
             "location": "[variables('location')]",
             "tags": "[parameters('tagValues')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/publicIpAddresses/', variables('azFirewallPublicIpName'))]",
-                "[concat('Microsoft.Network/publicIpAddresses/', variables('azFirewallMgmtPublicIpName'))]"
+                "[concat('Microsoft.Network/publicIpAddresses/', variables('azFirewallPublicIpName'))]"
             ],
             "zones": [
                 "1"
@@ -603,17 +587,6 @@
                         }
                     }
                 ],
-                "managementIpConfiguration": {
-                    "name": "mgmtipconfig",
-                    "properties": {
-                        "subnet": {
-                            "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), 'AzureFirewallManagementSubnet')]"
-                        },
-                        "publicIPAddress": {
-                            "id": "[resourceId('Microsoft.Network/publicIpAddresses', variables('azFirewallMgmtPublicIpName'))]"
-                        }
-                    }
-                },
                 "threatIntelMode": "Alert",
                 "sku": {
                     "name": "AZFW_VNet",
