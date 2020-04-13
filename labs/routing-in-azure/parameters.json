@@ -9,7 +9,9 @@
             "value": "Standard_DS2_v2"
         },
         "tags": {
-            "environment": "lab"
+            "value": {
+                "environment": "lab"
+            }
         },
         "hubVnetName": {
             "value":"vnet-hub"
