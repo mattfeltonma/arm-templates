@@ -383,13 +383,13 @@
                     {
                         "name": "[concat(parameters('appSubnetName'),copyIndex(1))]",
                         "properties": {
-                            "addressPrefix": "[concat(parameters('spokeAppSubnetCidrs')[copyIndex()])]"
+                            "addressPrefix": "[parameters('spokeAppSubnetCidrs')[copyIndex()]]"
                         }
                     },
                     {
                         "name": "[concat(parameters('dataSubnetName'),copyIndex(1))]",
                         "properties": {
-                            "addressPrefix": "[concat(parameters('spokeDataSubnetCidrs')[copyIndex()])]"
+                            "addressPrefix": "[parameters('spokeDataSubnetCidrs')[copyIndex()]]"
                         }
                     }
                 ],
