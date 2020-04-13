@@ -2,10 +2,10 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "tagValues": {
-            "type": "object",
+        "vmAdminPassword": {
+            "type": "securestring",
             "metadata": {
-                "description": "The tags that will be associated to the VM"
+                "description": "Password for the VMs that are created"
             }
         },
         "vmAdminUsername": {
@@ -14,10 +14,199 @@
                 "description": "Administrator name for VMs that are created"
             }
         },
-        "vmAdminPassword": {
-            "type": "securestring",
+        "vmSku": {
+            "type": "string",
             "metadata": {
-                "description": "Password for the VMs that are created"
+                "description": "The SKU of VM to deploy"
+            }
+        },
+        "tags": {
+            "type": "object",
+            "metadata": {
+                "description": "The tags that will be associated to the VM"
+            }
+        },
+        "hubVnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name assigned to the hub Virtual Network"
+            }
+        },
+        "onPremVnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name assigned to the on-premises Virtual Network"
+            }
+        },
+        "spokeVnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name assigned to the spoke Virtual Networks"
+            }
+        },
+        "hubCidr": {
+            "type": "string",
+            "metadata": {
+                "description": "The CIDR block assigned to the hub Virtual Network"
+            }
+        },
+        "onpremCidr": {
+            "type": "string",
+            "metadata": {
+                "description": "The CIDR block assigned to the on-premises Virtual Network"
+            }
+        },
+        "spokeCidrs": {
+            "type": "array",
+            "metadata": {
+                "description": "The CIDR blocks assigned to the spoke Virtual Networks"
+            },
+            "maxLength": 2
+        },
+        "hubGatewaySubnetCidr": {
+            "type": "string",
+            "metadata": {
+                "description": "The CIDR block assigned to the hub Gateway subnet"
+            }
+        },
+        "hubBastionSubnetCidr": {
+            "type": "string",
+            "metadata": {
+                "description": "The CIDR block assigned to the hub Bastion subnet"
+            }
+        },
+        "hubFirewallSubnetCidr": {
+            "type": "string",
+            "metadata": {
+                "description": "The CIDR block assigned to the hub Azure Firewall subnet"
+            }
+        },
+        "hubPrimarySubnetCidr": {
+            "type": "string",
+            "metadata": {
+                "description": "The CIDR block assigned to the hub primary subnet"
+            }
+        },
+        "hubSecondarySubnetCidr": {
+            "type": "string",
+            "metadata": {
+                "description": "The CIDR block assigned to the hub secondary subnet"
+            }
+        },
+        "onPremGatewaySubnetCidr": {
+            "type": "string",
+            "metadata": {
+                "description": "The CIDR block assigned to the on-premises Gateway subnet"
+            }
+        },
+        "onPremPrimarySubnetCidr": {
+            "type": "string",
+            "metadata": {
+                "description": "The CIDR block assigned to the on-premises primary subnet"
+            }
+        },
+        "spokeAppSubnetCidrs": {
+            "type": "array",
+            "metadata": {
+                "description": "The CIDR blocks assigned to the spoke application subnets"
+            },
+            "maxLength": 2
+        },
+        "spokeDataSubnetCidrs": {
+            "type": "array",
+            "metadata": {
+                "description": "The CIDR blocks assigned to the spoke data subnets"
+            },
+            "maxLength": 2
+        },
+        "primarySubnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name assigned to the primary subnet in the hub and on-premises Virtual Networks"
+            }
+        },
+        "secondarySubnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name assigned to the secondary subnet in the hub Virtual Network"
+            }
+        },
+        "appSubnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name assigned to the application subnet in the spoke Virtual Networks"
+            }
+        },
+        "dataSubnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name assigned to the data subnet in the spoke Virtual Networks"
+            }
+        },
+        "bastionPublicIpName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name assigned to the Public IP used by Azure Bastion"
+            }
+        },
+        "azFirewallPublicIpName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name assigned to the Public IP used by Azure Firewall"
+            }
+        },
+        "hubVngPublicIpName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name assigned to the Public IP used by hub Virtual Network Gateway"
+            }
+        },
+        "hubVngName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name assigned to the hub Virtual Network Gateway"
+            }
+        },
+        "onPremVngPublicIpName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name assigned to the Public IP used by the on-premises Virtual Network Gateway"
+            }
+        },
+        "onPremVngName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name assigned to the on-premises Virtual Network Gateway"
+            }
+        },
+        "bastionName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name assigned to the instance of Azure Bastion"
+            }
+        },
+        "azureFirewallName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name assigned to the Azure Firewall instance"
+            }
+        },
+        "hubRouteTable": {
+            "type": "string",
+            "metadata": {
+                "description": "The name assigned to the Route Table assigned to the primary and secondary subnets in the hub Virtual Network"
+            }
+        },
+        "hubVngRouteTable": {
+            "type": "string",
+            "metadata": {
+                "description": "The name assigned to the Route Table assigned to the Gateway subnet in the hub Virtual Network"
+            }
+        },
+        "spokeRouteTable": {
+            "type": "string",
+            "metadata": {
+                "description": "The name assigned to the Route Table assigned to the application and data subnets in the spoke Virtual Network"
             }
         }
     },
@@ -27,54 +216,13 @@
         "resourceDeploymentsApiVersion": "2019-10-01",
         "laApiVersion": "2015-11-01-preview",
         "diagApiVersion": "2017-05-01-preview",
-        "hubVnetName": "vnet-hub",
-        "onPremVnetName": "vnet-onprem",
-        "spokeVnetName": "vnet-spoke",
-        "hubCidr": "10.10.0.0/16",
-        "onpremCidr": "10.0.0.0/16",
-        "hubGatewaySubnetCidr": "10.10.0.0/24",
-        "hubBastionSubnetCidr": "10.10.1.0/24",
-        "hubFirewallSubnetCidr": "10.10.2.0/24",
-        "hubFirewallMgmtSubnetCidr": "10.10.3.0/24",
-        "hubPrimarySubnetCidr": "10.10.4.0/24",
-        "hubSecondarySubnetCidr": "10.10.5.0/24",
-        "onPremGatewaySubnetCidr": "10.0.0.0/24",
-        "onPremPrimarySubnetCidr": "10.0.1.0/24",
-        "spokeCidrs": [
-            "10.11.0.0/16",
-            "10.12.0.0/16"
-        ],
-        "appSubnetCidrs": [
-            "10.11.0.0/24",
-            "10.12.0.0/24"
-        ],
-        "dataSubnetCidrs": [
-            "10.11.1.0/24",
-            "10.12.1.0/24"
-        ],
         "bastionSubnetName": "AzureBastionSubnet",
-        "primarySubnetName": "snet-pri",
-        "secondarySubnetName": "snet-sec",
-        "appSubnetName": "snet-app",
-        "dataSubnetName": "snet-data",
         "hubToSpokePeeringName": "peerhubtospoke",
         "spokeToHubPeeringName": "peerspoketohub",
-        "bastionPublicIpName": "pip-bastion",
-        "azFirewallPublicIpName": "pip-azfw",
-        "hubVngPublicIpName": "pip-hubvng",
-        "hubVngName": "vng-hub",
         "hubVngConnName": "conn-hubtoonprem",
         "onpremVngConnName": "conn-onpremtohub",
-        "onPremVngPublicIpName": "pip-onpremvng",
-        "onPremVngName": "vng-onprem",
         "vngConnectionSecret": "[uniqueString(subscription().id, resourceGroup().id)]",
-        "laWorkspaceName": "[concat('la-',uniqueString(resourceGroup().id))]",
-        "bastionName": "bstss",
-        "azureFirewallName": "fwhub",
-        "hubRouteTable": "rt-hub",
-        "hubVNGRouteTable": "rt-vng-hub",
-        "spokeRouteTable": "rt-spoke",
-        "vmSize": "Standard_DS2_v2"
+        "laWorkspaceName": "[concat('la-',uniqueString(resourceGroup().id))]"
     },
     "resources": [
         /* Create centralized Log Analytics Workspace */
@@ -83,7 +231,7 @@
             "type": "Microsoft.OperationalInsights/workspaces",
             "apiVersion": "[variables('laApiVersion')]",
             "location": "[variables('location')]",
-            "tags": "[parameters('tagValues')]",
+            "tags": "[parameters('tags')]",
             "properties": {
                 "sku": {
                     "name": "PerGB2018"
@@ -96,51 +244,45 @@
         /* Create hub Virtual Network */
         {
             "type": "Microsoft.Network/virtualNetworks",
-            "name": "[variables('hubVnetName')]",
+            "name": "[parameters('hubVnetName')]",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags": "[parameters('tagValues')]",
+            "tags": "[parameters('tags')]",
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
-                        "[variables('hubCidr')]"
+                        "[parameters('hubCidr')]"
                     ]
                 },
                 "subnets": [
                     {
                         "name": "GatewaySubnet",
                         "properties": {
-                            "addressPrefix": "[variables('hubGatewaySubnetCidr')]"
+                            "addressPrefix": "[parameters('hubGatewaySubnetCidr')]"
                         }
                     },
                     {
                         "name": "AzureFirewallSubnet",
                         "properties": {
-                            "addressPrefix": "[variables('hubFirewallSubnetCidr')]"
-                        }
-                    },
-                    {
-                        "name": "AzureFirewallManagementSubnet",
-                        "properties": {
-                            "addressPrefix": "[variables('hubFirewallMgmtSubnetCidr')]"
+                            "addressPrefix": "[parameters('hubFirewallSubnetCidr')]"
                         }
                     },
                     {
                         "name": "AzureBastionSubnet",
                         "properties": {
-                            "addressPrefix": "[variables('hubBastionSubnetCidr')]"
+                            "addressPrefix": "[parameters('hubBastionSubnetCidr')]"
                         }
                     },
                     {
-                        "name": "[variables('primarySubnetName')]",
+                        "name": "[parameters('primarySubnetName')]",
                         "properties": {
-                            "addressPrefix": "[variables('hubPrimarySubnetCidr')]"
+                            "addressPrefix": "[parameters('hubPrimarySubnetCidr')]"
                         }
                     },
                     {
-                        "name": "[variables('secondarySubnetName')]",
+                        "name": "[parameters('secondarySubnetName')]",
                         "properties": {
-                            "addressPrefix": "[variables('hubSecondarySubnetCidr')]"
+                            "addressPrefix": "[parameters('hubSecondarySubnetCidr')]"
                         }
                     }
                 ],
@@ -152,27 +294,27 @@
         /* Create on-premises Virtual Network */
         {
             "type": "Microsoft.Network/virtualNetworks",
-            "name": "[variables('onPremVnetName')]",
+            "name": "[parameters('onPremVnetName')]",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags": "[parameters('tagValues')]",
+            "tags": "[parameters('tags')]",
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
-                        "[variables('onpremCidr')]"
+                        "[parameters('onpremCidr')]"
                     ]
                 },
                 "subnets": [
                     {
                         "name": "GatewaySubnet",
                         "properties": {
-                            "addressPrefix": "[variables('onPremGatewaySubnetCidr')]"
+                            "addressPrefix": "[parameters('onPremGatewaySubnetCidr')]"
                         }
                     },
                     {
-                        "name": "[variables('primarySubnetName')]",
+                        "name": "[parameters('primarySubnetName')]",
                         "properties": {
-                            "addressPrefix": "[variables('onPremPrimarySubnetCidr')]"
+                            "addressPrefix": "[parameters('onPremPrimarySubnetCidr')]"
                         }
                     }
                 ],
@@ -184,27 +326,27 @@
         /* Create two spoke Virtual Networks */
         {
             "type": "Microsoft.Network/virtualNetworks",
-            "name": "[concat(variables('spokeVnetName'),copyIndex(1))]",
+            "name": "[concat(parameters('spokeVnetName'),copyIndex(1))]",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags": "[parameters('tagValues')]",
+            "tags": "[parameters('tags')]",
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
-                        "[concat(variables('spokeCidrs')[copyIndex()])]"
+                        "[concat(parameters('spokeCidrs')[copyIndex()])]"
                     ]
                 },
                 "subnets": [
                     {
-                        "name": "[concat(variables('appSubnetName'),copyIndex(1))]",
+                        "name": "[concat(parameters('appSubnetName'),copyIndex(1))]",
                         "properties": {
-                            "addressPrefix": "[concat(variables('appSubnetCidrs')[copyIndex()])]"
+                            "addressPrefix": "[concat(parameters('spokeAppSubnetCidrs')[copyIndex()])]"
                         }
                     },
                     {
-                        "name": "[concat(variables('dataSubnetName'),copyIndex(1))]",
+                        "name": "[concat(parameters('dataSubnetName'),copyIndex(1))]",
                         "properties": {
-                            "addressPrefix": "[concat(variables('dataSubnetCidrs')[copyIndex()])]"
+                            "addressPrefix": "[concat(parameters('spokeDataSubnetCidrs')[copyIndex()])]"
                         }
                     }
                 ],
@@ -212,18 +354,18 @@
             },
             "copy": {
                 "name": "spokevnets",
-                "count": "[length(variables('spokeCidrs'))]"
+                "count": "[length(parameters('spokeCidrs'))]"
             },
             "resources": [
             ]
         },
         /* Create Public IP for hub Virtual Network Gateway */
         {
-            "name": "[variables('hubVngPublicIpName')]",
+            "name": "[parameters('hubVngPublicIpName')]",
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags": "[parameters('tagValues')]",
+            "tags": "[parameters('tags')]",
             "properties": {
                 "publicIpAllocationMethod": "Dynamic"
             },
@@ -233,14 +375,14 @@
         },
         /* Create hub Virtual Network Gateway */
         {
-            "name": "[variables('hubVngName')]",
+            "name": "[parameters('hubVngName')]",
             "type": "Microsoft.Network/virtualNetworkGateways",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags": "[parameters('tagValues')]",
+            "tags": "[parameters('tags')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/', variables('hubVngPublicIpName'))]",
-                "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]"
+                "[concat('Microsoft.Network/publicIPAddresses/', parameters('hubVngPublicIpName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('hubVnetName'))]"
             ],
             "properties": {
                 "gatewayType": "vpn",
@@ -250,10 +392,10 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), 'GatewaySubnet')]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('hubVnetName'), 'GatewaySubnet')]"
                             },
                             "publicIpAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('hubVngPublicIpName'))]"
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('hubVngPublicIpName'))]"
                             }
                         }
                     }
@@ -268,11 +410,11 @@
         },
         /* Create Public IP for on-premises Virtual Network Gateway */
         {
-            "name": "[variables('onPremVngPublicIpName')]",
+            "name": "[parameters('onPremVngPublicIpName')]",
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags": "[parameters('tagValues')]",
+            "tags": "[parameters('tags')]",
             "properties": {
                 "publicIpAllocationMethod": "Dynamic"
             },
@@ -282,14 +424,14 @@
         },
         /* Create on-premises Virtual Network Gateway */
         {
-            "name": "[variables('onPremVngName')]",
+            "name": "[parameters('onPremVngName')]",
             "type": "Microsoft.Network/virtualNetworkGateways",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags": "[parameters('tagValues')]",
+            "tags": "[parameters('tags')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/', variables('onPremVngPublicIpName'))]",
-                "[concat('Microsoft.Network/virtualNetworks/', variables('onPremVnetName'))]"
+                "[concat('Microsoft.Network/publicIPAddresses/', parameters('onPremVngPublicIpName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('onPremVnetName'))]"
             ],
             "properties": {
                 "gatewayType": "vpn",
@@ -299,10 +441,10 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('onPremVnetName'), 'GatewaySubnet')]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('onPremVnetName'), 'GatewaySubnet')]"
                             },
                             "publicIpAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('onPremVngPublicIpName'))]"
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('onPremVngPublicIpName'))]"
                             }
                         }
                     }
@@ -321,17 +463,17 @@
             "type": "Microsoft.Network/connections",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags": "[parameters('tagValues')]",
+            "tags": "[parameters('tags')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/virtualNetworkGateways/', variables('hubVngName'))]",
-                "[concat('Microsoft.Network/virtualNetworkGateways/', variables('onPremVngName'))]"
+                "[concat('Microsoft.Network/virtualNetworkGateways/', parameters('hubVngName'))]",
+                "[concat('Microsoft.Network/virtualNetworkGateways/', parameters('onPremVngName'))]"
             ],
             "properties": {
                 "virtualNetworkGateway1": {
-                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways/', variables('hubVngName'))]"
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways/',parameters('hubVngName'))]"
                 },
                 "virtualNetworkGateway2": {
-                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways/', variables('onPremVngName'))]"
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways/', parameters('onPremVngName'))]"
                 },
                 "connectionType": "Vnet2Vnet",
                 "connectionProtocol": "IKEv2",
@@ -352,18 +494,18 @@
             "type": "Microsoft.Network/connections",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags": "[parameters('tagValues')]",
+            "tags": "[parameters('tags')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/virtualNetworkGateways/', variables('hubVngName'))]",
-                "[concat('Microsoft.Network/virtualNetworkGateways/', variables('onPremVngName'))]"
+                "[concat('Microsoft.Network/virtualNetworkGateways/', parameters('hubVngName'))]",
+                "[concat('Microsoft.Network/virtualNetworkGateways/', parameters('onPremVngName'))]"
             ],
             "properties": {
                 "virtualNetworkGateway1": {
-                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways/', variables('onPremVngName'))]"
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways/', parameters('onPremVngName'))]"
 
                 },
                 "virtualNetworkGateway2": {
-                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways/', variables('hubVngName'))]"
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways/', parameters('hubVngName'))]"
                 },
                 "connectionType": "Vnet2Vnet",
                 "connectionProtocol": "IKEv2",
@@ -380,11 +522,11 @@
         },
         /* Create a Public IP for the Azure Bastion service hosted in the hub Virtual Network */
         {
-            "name": "[variables('bastionPublicIpName')]",
+            "name": "[parameters('bastionPublicIpName')]",
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags": "[parameters('tagValues')]",
+            "tags": "[parameters('tags')]",
             "properties": {
                 "publicIpAllocationMethod": "Static"
             },
@@ -394,11 +536,11 @@
         },
         /* Create a Public IP for the Azure Firewall instance */
         {
-            "name": "[variables('azFirewallPublicIpName')]",
+            "name": "[parameters('azFirewallPublicIpName')]",
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags": "[parameters('tagValues')]",
+            "tags": "[parameters('tags')]",
             "properties": {
                 "publicIpAllocationMethod": "Static"
             },
@@ -408,13 +550,13 @@
         },
         /* Create the Azure Firewall instance */
         {
-            "name": "[variables('azureFirewallName')]",
+            "name": "[parameters('azureFirewallName')]",
             "type": "Microsoft.Network/azureFirewalls",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags": "[parameters('tagValues')]",
+            "tags": "[parameters('tags')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/publicIpAddresses/', variables('azFirewallPublicIpName'))]"
+                "[concat('Microsoft.Network/publicIpAddresses/', parameters('azFirewallPublicIpName'))]"
             ],
             "zones": [
                 "1"
@@ -435,10 +577,10 @@
                                         "TCP"
                                     ],
                                     "sourceAddresses": [
-                                        "[variables('hubSecondarySubnetCidr')]"
+                                        "[parameters('hubSecondarySubnetCidr')]"
                                     ],
                                     "destinationAddresses": [
-                                        "[variables('hubSecondarySubnetCidr')]"
+                                        "[parameters('hubSecondarySubnetCidr')]"
                                     ],
                                     "destinationPorts": [
                                         "3389"
@@ -450,10 +592,10 @@
                                         "TCP"
                                     ],
                                     "sourceAddresses": [
-                                        "[variables('hubPrimarySubnetCidr')]"
+                                        "[parameters('hubPrimarySubnetCidr')]"
                                     ],
                                     "destinationAddresses": [
-                                        "[variables('hubSecondarySubnetCidr')]"
+                                        "[parameters('hubSecondarySubnetCidr')]"
                                     ],
                                     "destinationPorts": [
                                         "3389"
@@ -465,11 +607,11 @@
                                         "TCP"
                                     ],
                                     "sourceAddresses": [
-                                        "[variables('hubPrimarySubnetCidr')]"
+                                        "[parameters('hubPrimarySubnetCidr')]"
                                     ],
                                     "destinationAddresses": [
-                                        "[variables('appSubnetCidrs')[0]]",
-                                        "[variables('appSubnetCidrs')[1]]"
+                                        "[parameters('spokeAppSubnetCidrs')[0]]",
+                                        "[parameters('spokeAppSubnetCidrs')[1]]"
                                     ],
                                     "destinationPorts": [
                                         "3389"
@@ -481,10 +623,10 @@
                                         "TCP"
                                     ],
                                     "sourceAddresses": [
-                                        "[variables('appSubnetCidrs')[0]]"
+                                        "[parameters('spokeAppSubnetCidrs')[0]]"
                                     ],
                                     "destinationAddresses": [
-                                        "[variables('dataSubnetCidrs')[0]]"
+                                        "[parameters('spokeDataSubnetCidrs')[0]]"
                                     ],
                                     "destinationPorts": [
                                         "3389"
@@ -496,10 +638,10 @@
                                         "TCP"
                                     ],
                                     "sourceAddresses": [
-                                        "[variables('appSubnetCidrs')[0]]"
+                                        "[parameters('spokeAppSubnetCidrs')[0]]"
                                     ],
                                     "destinationAddresses": [
-                                        "[variables('appSubnetCidrs')[1]]"
+                                        "[parameters('spokeAppSubnetCidrs')[1]]"
                                     ],
                                     "destinationPorts": [
                                         "3389"
@@ -511,12 +653,12 @@
                                         "TCP"
                                     ],
                                     "sourceAddresses": [
-                                        "[variables('onpremCidr')]"
+                                        "[parameters('onpremCidr')]"
                                     ],
                                     "destinationAddresses": [
-                                        "[variables('hubCidr')]",
-                                        "[variables('spokeCidrs')[0]]",
-                                        "[variables('spokeCidrs')[1]]"
+                                        "[parameters('hubCidr')]",
+                                        "[parameters('spokeCidrs')[0]]",
+                                        "[parameters('spokeCidrs')[1]]"
                                     ],
                                     "destinationPorts": [
                                         "3389"
@@ -528,12 +670,12 @@
                                         "TCP"
                                     ],
                                     "sourceAddresses": [
-                                        "[variables('hubCidr')]",
-                                        "[variables('spokeCidrs')[0]]",
-                                        "[variables('spokeCidrs')[1]]"
+                                        "[parameters('hubCidr')]",
+                                        "[parameters('spokeCidrs')[0]]",
+                                        "[parameters('spokeCidrs')[1]]"
                                     ],
                                     "destinationAddresses": [
-                                        "[variables('onpremCidr')]"
+                                        "[parameters('onpremCidr')]"
                                     ],
                                     "destinationPorts": [
                                         "3389"
@@ -556,9 +698,9 @@
                                     "name": "AllowCNN",
                                     "description": "Allow access to CNN",
                                     "sourceAddresses": [
-                                        "[variables('hubCidr')]",
-                                        "[variables('appSubnetCidrs')[0]]",
-                                        "[variables('appSubnetCidrs')[1]]"
+                                        "[parameters('hubCidr')]",
+                                        "[parameters('spokeAppSubnetCidrs')[0]]",
+                                        "[parameters('spokeAppSubnetCidrs')[1]]"
                                     ],
                                     "protocols": [
                                         {
@@ -579,10 +721,10 @@
                         "name": "ipconfig1",
                         "properties": {
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), 'AzureFirewallSubnet')]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('hubVnetName'), 'AzureFirewallSubnet')]"
                             },
                             "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIpAddresses', variables('azFirewallPublicIpName'))]"
+                                "id": "[resourceId('Microsoft.Network/publicIpAddresses', parameters('azFirewallPublicIpName'))]"
                             }
                         }
                     }
@@ -596,13 +738,13 @@
         },
         /* Configure the diagnostic settings for Azure Firewall to write the Log Analytics Workspace */
         {
-            "name": "[concat(variables('azureFirewallName'),'/microsoft.insights/diag')]",
+            "name": "[concat(parameters('azureFirewallName'),'/microsoft.insights/diag')]",
             "type": "Microsoft.Network/azureFirewalls/providers/diagnosticSettings",
             "apiVersion": "[variables('diagApiVersion')]",
             "location": "[variables('location')]",
-            "tags": "[parameters('tagValues')]",
+            "tags": "[parameters('tags')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/azureFirewalls/',variables('azureFirewallName'))]"
+                "[concat('Microsoft.Network/azureFirewalls/',parameters('azureFirewallName'))]"
             ],
             "properties": {
                 "name": "SendToWorkspace",
@@ -629,22 +771,22 @@
         },
         /* Create a Route Table for the Gateway Subnet in the hub Virtual Network */
         {
-            "name": "[variables('hubVNGRouteTable')]",
+            "name": "[parameters('hubVNGRouteTable')]",
             "type": "Microsoft.Network/routeTables",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags": "[parameters('tagValues')]",
+            "tags": "[parameters('tags')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/azureFirewalls/',variables('azureFirewallName'))]"
+                "[concat('Microsoft.Network/azureFirewalls/',parameters('azureFirewallName'))]"
             ],
             "properties": {
                 "routes": [
                     {
                         "name": "udr-hub",
                         "properties": {
-                            "addressPrefix": "[variables('hubCidr')]",
+                            "addressPrefix": "[parameters('hubCidr')]",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "[reference(variables('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }
                     }
                 ],
@@ -655,13 +797,13 @@
         },
         /* Create a Route Table for the primary and secondary subnets in the hub Virtual Network */
         {
-            "name": "[variables('hubRouteTable')]",
+            "name": "[parameters('hubRouteTable')]",
             "type": "Microsoft.Network/routeTables",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags": "[parameters('tagValues')]",
+            "tags": "[parameters('tags')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/azureFirewalls/',variables('azureFirewallName'))]"
+                "[concat('Microsoft.Network/azureFirewalls/',parameters('azureFirewallName'))]"
             ],
             "properties": {
                 "routes": [
@@ -670,30 +812,30 @@
                         "properties": {
                             "addressPrefix": "0.0.0.0/0",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "[reference(variables('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }
                     },
                     {
                         "name": "udr-bastion",
                         "properties": {
-                            "addressPrefix": "[variables('hubBastionSubnetCidr')]",
+                            "addressPrefix": "[parameters('hubBastionSubnetCidr')]",
                             "nextHopType": "VnetLocal"
                         }
                     },
                     {
                         "name": "udr-hub",
                         "properties": {
-                            "addressPrefix": "[variables('hubCidr')]",
+                            "addressPrefix": "[parameters('hubCidr')]",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "[reference(variables('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }
                     },
                     {
                         "name": "udr-onprem",
                         "properties": {
-                            "addressPrefix": "[variables('onpremCidr')]",
+                            "addressPrefix": "[parameters('onpremCidr')]",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "[reference(variables('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }
                     }
                 ],
@@ -705,52 +847,52 @@
         /* Create two URDs (User Defined Routes) for the route table applied to the primary and secondary
         subnets in the hub Virtual Network to route destinated to the spoke Virtual Networks to Azure Firewall */
         {
-            "name": "[concat(variables('hubRouteTable'),'/','udr-spoke',copyIndex(1))]",
+            "name": "[concat(parameters('hubRouteTable'),'/','udr-spoke',copyIndex(1))]",
             "type": "Microsoft.Network/routeTables/routes",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/routeTables/', variables('hubRouteTable'))]"
+                "[concat('Microsoft.Network/routeTables/', parameters('hubRouteTable'))]"
             ],
             "properties": {
-                "addressPrefix": "[variables('spokeCidrs')[copyIndex()]]",
+                "addressPrefix": "[parameters('spokeCidrs')[copyIndex()]]",
                 "nextHopType": "VirtualAppliance",
-                "nextHopIpAddress": "[reference(variables('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
+                "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
             },
             "copy": {
                 "name": "copyspokerouteshub",
-                "count": "[length(variables('spokeCidrs'))]"
+                "count": "[length(parameters('spokeCidrs'))]"
             }
         },
         /* Create two URDs (User Defined Routes) for the route table applied to the Gateway Subnet
         in the hub Virtual Network to route destinated to the spoke Virtual Networks to Azure Firewall */
         {
-            "name": "[concat(variables('hubVNGRouteTable'),'/','udr-spoke',copyIndex(1))]",
+            "name": "[concat(parameters('hubVNGRouteTable'),'/','udr-spoke',copyIndex(1))]",
             "type": "Microsoft.Network/routeTables/routes",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/routeTables/', variables('hubVNGRouteTable'))]"
+                "[concat('Microsoft.Network/routeTables/', parameters('hubVNGRouteTable'))]"
             ],
             "properties": {
-                "addressPrefix": "[variables('spokeCidrs')[copyIndex()]]",
+                "addressPrefix": "[parameters('spokeCidrs')[copyIndex()]]",
                 "nextHopType": "VirtualAppliance",
-                "nextHopIpAddress": "[reference(variables('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
+                "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
             },
             "copy": {
                 "name": "copyspokeroutesvng",
-                "count": "[length(variables('spokeCidrs'))]"
+                "count": "[length(parameters('spokeCidrs'))]"
             }
         },
         /* Create a Route Table for the app and data subnets in the spoke Virtual Network */
         {
-            "name": "[variables('spokeRouteTable')]",
+            "name": "[parameters('spokeRouteTable')]",
             "type": "Microsoft.Network/routeTables",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
-            "tags": "[parameters('tagValues')]",
+            "tags": "[parameters('tags')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/azureFirewalls/',variables('azureFirewallName'))]"
+                "[concat('Microsoft.Network/azureFirewalls/',parameters('azureFirewallName'))]"
             ],
             "properties": {
                 "routes": [
@@ -759,15 +901,15 @@
                         "properties": {
                             "addressPrefix": "0.0.0.0/0",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "[reference(variables('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }
                     },
                     {
                         "name": "udr-hub",
                         "properties": {
-                            "addressPrefix": "[variables('hubCidr')]",
+                            "addressPrefix": "[parameters('hubCidr')]",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "[reference(variables('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }
                     }
                 ],
@@ -782,10 +924,10 @@
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "type": "Microsoft.Resources/deployments",
             "dependsOn": [
-                "[concat('Microsoft.Network/virtualNetworkGateways/', variables('hubVngName'))]",
-                "[concat('Microsoft.Network/routeTables/', variables('hubRouteTable'))]",
-                "[concat('Microsoft.Network/routeTables/', variables('hubVNGRouteTable'))]",
-                "[concat('Microsoft.Network/routeTables/', variables('spokeRouteTable'))]"
+                "[concat('Microsoft.Network/virtualNetworkGateways/', parameters('hubVngName'))]",
+                "[concat('Microsoft.Network/routeTables/', parameters('hubRouteTable'))]",
+                "[concat('Microsoft.Network/routeTables/', parameters('hubVNGRouteTable'))]",
+                "[concat('Microsoft.Network/routeTables/', parameters('spokeRouteTable'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -797,49 +939,49 @@
                         "value": "[variables('netApiVersionNum')]"
                     },
                     "hubGatewaySubnetRouteTableId": {
-                        "value": "[resourceId('Microsoft.Network/routeTables',variables('hubVNGRouteTable'))]"
+                        "value": "[resourceId('Microsoft.Network/routeTables',parameters('hubVNGRouteTable'))]"
                     },
                     "hubRouteTableId": {
-                        "value": "[resourceId('Microsoft.Network/routeTables',variables('hubRouteTable'))]"
+                        "value": "[resourceId('Microsoft.Network/routeTables',parameters('hubRouteTable'))]"
                     },
                     "spokeRouteTableId": {
-                        "value": "[resourceId('Microsoft.Network/routeTables',variables('spokeRouteTable'))]"
+                        "value": "[resourceId('Microsoft.Network/routeTables',parameters('spokeRouteTable'))]"
                     },
                     "hubVnetName": {
-                        "value": "[variables('hubVnetName')]"
+                        "value": "[parameters('hubVnetName')]"
                     },
                     "hubGatewaySubnetCidr": {
-                        "value": "[variables('hubGatewaySubnetCidr')]"
+                        "value": "[parameters('hubGatewaySubnetCidr')]"
                     },
                     "hubPrimarySubnetCidr": {
-                        "value": "[variables('hubPrimarySubnetCidr')]"
+                        "value": "[parameters('hubPrimarySubnetCidr')]"
                     },
                     "hubSecondarySubnetCidr": {
-                        "value": "[variables('hubSecondarySubnetCidr')]"
+                        "value": "[parameters('hubSecondarySubnetCidr')]"
                     },
                     "primarySubnetName": {
-                        "value": "[variables('primarySubnetName')]"
+                        "value": "[parameters('primarySubnetName')]"
                     },
                     "secondarySubnetName": {
-                        "value": "[variables('secondarySubnetName')]"
+                        "value": "[parameters('secondarySubnetName')]"
                     },
                     "spokeVnetName": {
-                        "value": "[variables('spokeVnetName')]"
+                        "value": "[parameters('spokeVnetName')]"
                     },
                     "appSubnetName": {
-                        "value": "[variables('appSubnetName')]"
+                        "value": "[parameters('appSubnetName')]"
                     },
                     "dataSubnetName": {
-                        "value": "[variables('dataSubnetName')]"
+                        "value": "[parameters('dataSubnetName')]"
                     },
                     "spokeCidrs": {
-                        "value": "[variables('spokeCidrs')]"
+                        "value": "[parameters('spokeCidrs')]"
                     },
                     "appSubnetCidrs": {
-                        "value": "[variables('appSubnetCidrs')]"
+                        "value": "[parameters('spokeAppSubnetCidrs')]"
                     },
                     "dataSubnetCidrs": {
-                        "value": "[variables('dataSubnetCidrs')]"
+                        "value": "[parameters('spokeDataSubnetCidrs')]"
                     }
                 },
                 "template": {
@@ -974,14 +1116,14 @@
         },
         /* Create Virtual Network Peering on hub to peer each spoke to it */
         {
-            "name": "[concat(variables('hubVnetName'),'/',variables('hubToSpokePeeringName'),copyIndex(1))]",
+            "name": "[concat(parameters('hubVnetName'),'/',variables('hubToSpokePeeringName'),copyIndex(1))]",
             "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]",
-                "[concat('Microsoft.Network/virtualNetworks/', variables('spokeVnetName'),copyIndex(1))]",
-                "[concat('Microsoft.Network/virtualNetworkGateways/', variables('hubVngName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('hubVnetName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('spokeVnetName'),copyIndex(1))]",
+                "[concat('Microsoft.Network/virtualNetworkGateways/', parameters('hubVngName'))]",
                 "Microsoft.Resources/deployments/routeAssignment"
             ],
             "properties": {
@@ -989,24 +1131,24 @@
                 "allowForwardedTraffic": "true",
                 "allowGatewayTransit": "true",
                 "remoteVirtualNetwork": {
-                    "id": "[resourceId('Microsoft.Network/virtualNetworks',concat(variables('spokeVnetName'),copyIndex(1)))]"
+                    "id": "[resourceId('Microsoft.Network/virtualNetworks',concat(parameters('spokeVnetName'),copyIndex(1)))]"
                 }
             },
             "copy": {
                 "name": "copyhubpeerings",
-                "count": "[length(variables('spokeCidrs'))]"
+                "count": "[length(parameters('spokeCidrs'))]"
             }
         },
         /* Create Virtual Network Peering on each spoke to peer it to the hub */
         {
-            "name": "[concat(variables('spokeVnetName'),copyIndex(1),'/',variables('spokeToHubPeeringName'))]",
+            "name": "[concat(parameters('spokeVnetName'),copyIndex(1),'/',variables('spokeToHubPeeringName'))]",
             "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]",
-                "[concat('Microsoft.Network/virtualNetworks/', variables('spokeVnetName'),copyIndex(1))]",
-                "[concat('Microsoft.Network/virtualNetworkGateways/', variables('hubVngName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('hubVnetName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('spokeVnetName'),copyIndex(1))]",
+                "[concat('Microsoft.Network/virtualNetworkGateways/', parameters('hubVngName'))]",
                 "Microsoft.Resources/deployments/routeAssignment"
             ],
             "properties": {
@@ -1015,12 +1157,12 @@
                 "allowGatewayTransit": "false",
                 "useRemoteGateways": "true",
                 "remoteVirtualNetwork": {
-                    "id": "[resourceId('Microsoft.Network/virtualNetworks',variables('hubVnetName'))]"
+                    "id": "[resourceId('Microsoft.Network/virtualNetworks',parameters('hubVnetName'))]"
                 }
             },
             "copy": {
                 "name": "copyspokepeerings",
-                "count": "[length(variables('spokeCidrs'))]"
+                "count": "[length(parameters('spokeCidrs'))]"
             }
         },
         /* Deploy a VM into the primary subnet in the hub Virtual Network */
@@ -1029,9 +1171,9 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]",
-                "[concat('Microsoft.Network/routeTables/', variables('hubRouteTable'))]",
-                "[concat('Microsoft.Network/azureFirewalls/', variables('azureFirewallName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('hubVnetName'))]",
+                "[concat('Microsoft.Network/routeTables/', parameters('hubRouteTable'))]",
+                "[concat('Microsoft.Network/azureFirewalls/', parameters('azureFirewallName'))]",
                 "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]",
                 "Microsoft.Resources/deployments/routeAssignment"
             ],
@@ -1039,19 +1181,19 @@
                 "mode": "Incremental",
                 "parameters": {
                     "tagValues": {
-                        "value": "[parameters('tagValues')]"
+                        "value": "[parameters('tags')]"
                     },
                     "vmName": {
                         "value": "vmhubprim"
                     },
                     "vnetName": {
-                        "value": "[variables('hubVnetName')]"
+                        "value": "[parameters('hubVnetName')]"
                     },
                     "subnetName": {
-                        "value": "[variables('primarySubnetName')]"
+                        "value": "[parameters('primarySubnetName')]"
                     },
                     "virtualMachineSize": {
-                        "value": "[variables('vmSize')]"
+                        "value": "[parameters('vmSku')]"
                     },
                     "adminUserName": {
                         "value": "[parameters('vmAdminUsername')]"
@@ -1067,7 +1209,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/mattfeltonma/arm-templates/master/vm-win-2016/vm-win-2016.json",
+                    "uri": "https://raw.githubusercontent.com/mattfeltonma/arm-templates/master/examples/vm-windows-server-2016/vm-win-2016.json",
                     "contentVersion": "1.0.0.0"
                 }
             }
@@ -1078,9 +1220,9 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]",
-                "[concat('Microsoft.Network/routeTables/', variables('hubRouteTable'))]",
-                "[concat('Microsoft.Network/azureFirewalls/', variables('azureFirewallName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('hubVnetName'))]",
+                "[concat('Microsoft.Network/routeTables/', parameters('hubRouteTable'))]",
+                "[concat('Microsoft.Network/azureFirewalls/',parameters('azureFirewallName'))]",
                 "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]",
                 "Microsoft.Resources/deployments/routeAssignment"
             ],
@@ -1088,19 +1230,19 @@
                 "mode": "Incremental",
                 "parameters": {
                     "tagValues": {
-                        "value": "[parameters('tagValues')]"
+                        "value": "[parameters('tags')]"
                     },
                     "vmName": {
                         "value": "[concat('vmhubsec',copyIndex(1))]"
                     },
                     "vnetName": {
-                        "value": "[variables('hubVnetName')]"
+                        "value": "[parameters('hubVnetName')]"
                     },
                     "subnetName": {
-                        "value": "[variables('secondarySubnetName')]"
+                        "value": "[parameters('secondarySubnetName')]"
                     },
                     "virtualMachineSize": {
-                        "value": "[variables('vmSize')]"
+                        "value": "[parameters('vmSku')]"
                     },
                     "adminUserName": {
                         "value": "[parameters('vmAdminUsername')]"
@@ -1116,7 +1258,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/mattfeltonma/arm-templates/master/vm-win-2016/vm-win-2016.json",
+                    "uri": "https://raw.githubusercontent.com/mattfeltonma/arm-templates/master/examples/vm-windows-server-2016/vm-win-2016.json",
                     "contentVersion": "1.0.0.0"
                 }
             },
@@ -1131,11 +1273,11 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/virtualNetworks/', variables('onPremVnetName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('onPremVnetName'))]",
                 "[concat('Microsoft.Network/connections/', variables('onpremVngConnName'))]",
                 "[concat('Microsoft.Network/connections/', variables('hubVngConnName'))]",
-                "[concat('Microsoft.Network/routeTables/', variables('hubVNGRouteTable'))]",
-                "[concat('Microsoft.Network/azureFirewalls/', variables('azureFirewallName'))]",
+                "[concat('Microsoft.Network/routeTables/', parameters('hubVNGRouteTable'))]",
+                "[concat('Microsoft.Network/azureFirewalls/', parameters('azureFirewallName'))]",
                 "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]",
                 "Microsoft.Resources/deployments/routeAssignment"
             ],
@@ -1143,19 +1285,19 @@
                 "mode": "Incremental",
                 "parameters": {
                     "tagValues": {
-                        "value": "[parameters('tagValues')]"
+                        "value": "[parameters('tags')]"
                     },
                     "vmName": {
                         "value": "vmonprempri"
                     },
                     "vnetName": {
-                        "value": "[variables('onPremVnetName')]"
+                        "value": "[parameters('onPremVnetName')]"
                     },
                     "subnetName": {
-                        "value": "[variables('primarySubnetName')]"
+                        "value": "[parameters('primarySubnetName')]"
                     },
                     "virtualMachineSize": {
-                        "value": "[variables('vmSize')]"
+                        "value": "[parameters('vmSku')]"
                     },
                     "adminUserName": {
                         "value": "[parameters('vmAdminUsername')]"
@@ -1171,7 +1313,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/mattfeltonma/arm-templates/master/vm-win-2016/vm-win-2016.json",
+                    "uri": "https://raw.githubusercontent.com/mattfeltonma/arm-templates/master/examples/vm-windows-server-2016/vm-win-2016.json",
                     "contentVersion": "1.0.0.0"
                 }
             }
@@ -1182,33 +1324,33 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/virtualNetworks/', variables('spokeVnetName'), copyIndex(1))]",
-                "[concat(concat('Microsoft.Network/virtualNetworks/', variables('spokeVnetName'), copyIndex(1)),'/virtualNetworkPeerings/',variables('spokeToHubPeeringName'))]",
-                "[concat('Microsoft.Network/virtualNetworks/',variables('hubVnetName'),'/virtualNetworkPeerings/',variables('hubToSpokePeeringName'),copyIndex(1))]",
-                "[concat(concat('Microsoft.Network/routeTables/',variables('hubRouteTable')),'/routes/',concat('udr-spoke',copyIndex(1)))]",
-                "[concat('Microsoft.Network/routeTables/',variables('spokeRouteTable'))]",
-                "[concat('Microsoft.Network/azureFirewalls/', variables('azureFirewallName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('spokeVnetName'), copyIndex(1))]",
+                "[concat(concat('Microsoft.Network/virtualNetworks/', parameters('spokeVnetName'), copyIndex(1)),'/virtualNetworkPeerings/',variables('spokeToHubPeeringName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/',parameters('hubVnetName'),'/virtualNetworkPeerings/',variables('hubToSpokePeeringName'),copyIndex(1))]",
+                "[concat(concat('Microsoft.Network/routeTables/',parameters('hubRouteTable')),'/routes/',concat('udr-spoke',copyIndex(1)))]",
+                "[concat('Microsoft.Network/routeTables/',parameters('spokeRouteTable'))]",
+                "[concat('Microsoft.Network/azureFirewalls/', parameters('azureFirewallName'))]",
                 "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]",
-                "[concat('Microsoft.Network/virtualNetworks/',variables('hubVnetName'),'/virtualNetworkPeerings/',variables('hubToSpokePeeringName'),copyIndex(1))]",
+                "[concat('Microsoft.Network/virtualNetworks/',parameters('hubVnetName'),'/virtualNetworkPeerings/',variables('hubToSpokePeeringName'),copyIndex(1))]",
                 "Microsoft.Resources/deployments/routeAssignment"
             ],
             "properties": {
                 "mode": "Incremental",
                 "parameters": {
                     "tagValues": {
-                        "value": "[parameters('tagValues')]"
+                        "value": "[parameters('tags')]"
                     },
                     "vmName": {
                         "value": "[concat('vmspoke',copyIndex(1),'app')]"
                     },
                     "vnetName": {
-                        "value": "[concat(variables('spokeVnetName'),copyIndex(1))]"
+                        "value": "[concat(parameters('spokeVnetName'),copyIndex(1))]"
                     },
                     "subnetName": {
-                        "value": "[concat(variables('appSubnetName'),copyIndex(1))]"
+                        "value": "[concat(parameters('appSubnetName'),copyIndex(1))]"
                     },
                     "virtualMachineSize": {
-                        "value": "[variables('vmSize')]"
+                        "value": "[parameters('vmSku')]"
                     },
                     "adminUserName": {
                         "value": "[parameters('vmAdminUsername')]"
@@ -1224,39 +1366,39 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/mattfeltonma/arm-templates/master/vm-win-2016/vm-win-2016.json",
+                    "uri": "https://raw.githubusercontent.com/mattfeltonma/arm-templates/master/examples/vm-windows-server-2016/vm-win-2016.json",
                     "contentVersion": "1.0.0.0"
                 }
             },
             "copy": {
                 "name": "vmspokeapp",
-                "count": "[length(variables('spokeCidrs'))]"
+                "count": "[length(parameters('spokeCidrs'))]"
             }
         },
         /* Create an Azure Bastion instance in the hub Virtual Network */
         {
-            "name": "[variables('bastionName')]",
+            "name": "[parameters('bastionName')]",
             "type": "Microsoft.Network/bastionHosts",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/publicIpAddresses/', variables('bastionPublicIpName'))]",
-                "[concat('Microsoft.Network/virtualNetworks/', variables('hubVnetName'))]",
+                "[concat('Microsoft.Network/publicIpAddresses/',parameters('bastionPublicIpName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/',parameters('hubVnetName'))]",
                 "Microsoft.Resources/deployments/vmhp01",
                 "Microsoft.Resources/deployments/vmhs01",
                 "Microsoft.Resources/deployments/vmhs02"       
             ],
-            "tags": "[parameters('tagValues')]",
+            "tags": "[parameters('tags')]",
             "properties": {
                 "ipConfigurations": [
                     {
                         "name": "bastionConfig",
                         "properties": {
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('bastionSubnetName'))]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('hubVnetName'), variables('bastionSubnetName'))]"
                             },
                             "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIpAddresses', variables('bastionPublicIpName'))]"
+                                "id": "[resourceId('Microsoft.Network/publicIpAddresses', parameters('bastionPublicIpName'))]"
                             },
                             "privateIPAllocationMethod": "Dynamic"
                         }
