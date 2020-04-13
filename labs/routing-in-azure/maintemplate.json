@@ -18,98 +18,122 @@
             "type": "string",
             "metadata": {
                 "description": "The SKU of VM to deploy"
-            }
+            },
+            "defaultValue": "Standard_DS2_v2"
         },
         "tags": {
             "type": "object",
             "metadata": {
                 "description": "The tags that will be associated to the VM"
+            },
+            "defaultValue": {
+                "environment": "routelab"
             }
         },
         "hubVnetName": {
             "type": "string",
             "metadata": {
                 "description": "The name assigned to the hub Virtual Network"
-            }
+            },
+            "defaultValue": "vnet-hub"
         },
         "onPremVnetName": {
             "type": "string",
             "metadata": {
                 "description": "The name assigned to the on-premises Virtual Network"
-            }
+            },
+            "defaultValue": "vnet-onprem"
         },
         "spokeVnetName": {
             "type": "string",
             "metadata": {
                 "description": "The name assigned to the spoke Virtual Networks"
-            }
+            },
+            "defaultValue": "vnet-spoke"
         },
         "hubCidr": {
             "type": "string",
             "metadata": {
                 "description": "The CIDR block assigned to the hub Virtual Network"
-            }
+            },
+            "defaultValue": "10.1.0.0/16"
         },
         "onpremCidr": {
             "type": "string",
             "metadata": {
                 "description": "The CIDR block assigned to the on-premises Virtual Network"
-            }
+            },
+            "defaultValue": "10.0.0.0/16"
         },
         "spokeCidrs": {
             "type": "array",
             "metadata": {
                 "description": "The CIDR blocks assigned to the spoke Virtual Networks"
             },
+            "defaultValue": [
+                "10.2.0.0/16",
+                "10.3.0.0/16"
+            ],
             "maxLength": 2
         },
         "hubGatewaySubnetCidr": {
             "type": "string",
             "metadata": {
                 "description": "The CIDR block assigned to the hub Gateway subnet"
-            }
+            },
+            "defaultValue": "10.1.0.0/24"
         },
         "hubBastionSubnetCidr": {
             "type": "string",
             "metadata": {
                 "description": "The CIDR block assigned to the hub Bastion subnet"
-            }
+            },
+            "defaultValue": "10.1.1.0/24"
         },
         "hubFirewallSubnetCidr": {
             "type": "string",
             "metadata": {
                 "description": "The CIDR block assigned to the hub Azure Firewall subnet"
-            }
+            },
+            "defaultValue": "10.1.2.0/24"
         },
         "hubPrimarySubnetCidr": {
             "type": "string",
             "metadata": {
                 "description": "The CIDR block assigned to the hub primary subnet"
-            }
+            },
+            "defaultValue": "10.1.3.0/24"
         },
         "hubSecondarySubnetCidr": {
             "type": "string",
             "metadata": {
                 "description": "The CIDR block assigned to the hub secondary subnet"
-            }
+            },
+            "defaultValue": "10.1.4.0/24"
         },
         "onPremGatewaySubnetCidr": {
             "type": "string",
             "metadata": {
                 "description": "The CIDR block assigned to the on-premises Gateway subnet"
-            }
+            },
+            "defaultValue": "10.0.0.0/24"
         },
         "onPremPrimarySubnetCidr": {
             "type": "string",
             "metadata": {
                 "description": "The CIDR block assigned to the on-premises primary subnet"
-            }
+            },
+            "defaultValue": "10.0.1.0/24"
         },
         "spokeAppSubnetCidrs": {
             "type": "array",
             "metadata": {
                 "description": "The CIDR blocks assigned to the spoke application subnets"
             },
+            "defaultValue": [
+                "10.11.0.0/24",
+                "10.12.0.0/24"
+            ],
             "maxLength": 2
         },
         "spokeDataSubnetCidrs": {
@@ -117,97 +141,116 @@
             "metadata": {
                 "description": "The CIDR blocks assigned to the spoke data subnets"
             },
+            "defaultValue": [
+                "10.11.1.0/24",
+                "10.12.1.0/24"
+            ],
             "maxLength": 2
         },
         "primarySubnetName": {
             "type": "string",
             "metadata": {
                 "description": "The name assigned to the primary subnet in the hub and on-premises Virtual Networks"
-            }
+            },
+            "defaultValue": "snet-pri"
         },
         "secondarySubnetName": {
             "type": "string",
             "metadata": {
                 "description": "The name assigned to the secondary subnet in the hub Virtual Network"
-            }
+            },
+            "defaultValue": "snet-sec"
         },
         "appSubnetName": {
             "type": "string",
             "metadata": {
                 "description": "The name assigned to the application subnet in the spoke Virtual Networks"
-            }
+            },
+            "defaultValue": "snet-app"
         },
         "dataSubnetName": {
             "type": "string",
             "metadata": {
                 "description": "The name assigned to the data subnet in the spoke Virtual Networks"
-            }
+            },
+            "defaultValue": "snet-data"
         },
         "bastionPublicIpName": {
             "type": "string",
             "metadata": {
                 "description": "The name assigned to the Public IP used by Azure Bastion"
-            }
+            },
+            "defaultValue": "pip-bastion"
         },
         "azFirewallPublicIpName": {
             "type": "string",
             "metadata": {
                 "description": "The name assigned to the Public IP used by Azure Firewall"
-            }
+            },
+            "defaultValue": "pip-azfw"
         },
         "hubVngPublicIpName": {
             "type": "string",
             "metadata": {
                 "description": "The name assigned to the Public IP used by hub Virtual Network Gateway"
-            }
+            },
+            "defaultValue": "pip-hubvng"
         },
         "hubVngName": {
             "type": "string",
             "metadata": {
                 "description": "The name assigned to the hub Virtual Network Gateway"
-            }
+            },
+            "defaultValue": "vng-hub"
         },
         "onPremVngPublicIpName": {
             "type": "string",
             "metadata": {
                 "description": "The name assigned to the Public IP used by the on-premises Virtual Network Gateway"
-            }
+            },
+            "defaultValue": "pip-onpremvng"
         },
         "onPremVngName": {
             "type": "string",
             "metadata": {
                 "description": "The name assigned to the on-premises Virtual Network Gateway"
-            }
+            },
+            "defaultValue": "vng-onprem"
         },
         "bastionName": {
             "type": "string",
             "metadata": {
                 "description": "The name assigned to the instance of Azure Bastion"
-            }
+            },
+            "defaultValue": "bstss"
         },
         "azureFirewallName": {
             "type": "string",
             "metadata": {
                 "description": "The name assigned to the Azure Firewall instance"
-            }
+            },
+            "defaultValue": "fwhub"
         },
         "hubRouteTable": {
             "type": "string",
             "metadata": {
                 "description": "The name assigned to the Route Table assigned to the primary and secondary subnets in the hub Virtual Network"
-            }
+            },
+            "defaultValue": "rt-hub"
         },
         "hubVngRouteTable": {
             "type": "string",
             "metadata": {
                 "description": "The name assigned to the Route Table assigned to the Gateway subnet in the hub Virtual Network"
-            }
+            },
+            "defaultValue": "rt-vng-hub"
         },
         "spokeRouteTable": {
             "type": "string",
             "metadata": {
                 "description": "The name assigned to the Route Table assigned to the application and data subnets in the spoke Virtual Network"
-            }
+            },
+            "defaultValue": "rt-spoke"
         }
     },
     "variables": {
@@ -1068,7 +1111,7 @@
                             "type": "Microsoft.Network/virtualNetworks/subnets",
                             "dependsOn": [
                                 "[concat('Microsoft.Network/virtualNetworks/',parameters('hubVnetName'), '/subnets/',parameters('primarySubnetName'))]"
-                            ],                            
+                            ],
                             "apiVersion": "[parameters('netApiVersionNum')]",
                             "properties": {
                                 "addressPrefix": "[parameters('hubSecondarySubnetCidr')]",
@@ -1097,7 +1140,7 @@
                             "type": "Microsoft.Network/virtualNetworks/subnets",
                             "dependsOn": [
                                 "[concat('Microsoft.Network/virtualNetworks/',parameters('spokeVnetName'), copyIndex(1), '/subnets/',parameters('appSubnetName'),copyIndex(1))]"
-                            ],    
+                            ],
                             "apiVersion": "[parameters('netApiVersionNum')]",
                             "properties": {
                                 "addressPrefix": "[parameters('dataSubnetCidrs')[copyIndex()]]",
@@ -1386,7 +1429,7 @@
                 "[concat('Microsoft.Network/virtualNetworks/',parameters('hubVnetName'))]",
                 "Microsoft.Resources/deployments/vmhp01",
                 "Microsoft.Resources/deployments/vmhs01",
-                "Microsoft.Resources/deployments/vmhs02"       
+                "Microsoft.Resources/deployments/vmhs02"
             ],
             "tags": "[parameters('tags')]",
             "properties": {
