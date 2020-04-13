@@ -2,16 +2,16 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "vmAdminPassword": {
-            "type": "securestring",
-            "metadata": {
-                "description": "Password for the VMs that are created"
-            }
-        },
         "vmAdminUsername": {
             "type": "string",
             "metadata": {
                 "description": "Administrator name for VMs that are created"
+            }
+        },
+        "vmAdminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Password for the VMs that are created"
             }
         },
         "vmSku": {
@@ -376,7 +376,7 @@
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
-                        "[concat(parameters('spokeCidrs')[copyIndex()])]"
+                        "[parameters('spokeCidrs')[copyIndex()]]"
                     ]
                 },
                 "subnets": [
