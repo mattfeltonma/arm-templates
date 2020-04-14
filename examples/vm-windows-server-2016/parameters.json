@@ -2,20 +2,22 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "environment": {
-            "value":"demo"
-        },
-        "vmname": {
+        "vmName": {
             "value":"VM_NAME"
         },
-        "subnetName": {
-            "value":"VM_SUBNET_NAME"
+        /* Optional only if VNet is in a different subscription */
+        "vnetSubscriptionId": {
+            "value":"VNET_SUBSCRIPTION_ID"
         },
-        "virtualNetworkName": {
+        /* Optional only if VNet is in a different resource group */
+        "vnetResourceGroup": {
+            "value": "VNET_RESOURCE_GROUP"
+        },
+        "vnetName": {
             "value":"VM_VNET_NAME"
         },
-        "networkResourceGroup": {
-            "value": "VNET_RESOURCE_GROUP"
+        "subnetName": {
+            "value": "VM_SUBNET_NAME"
         },
         "virtualMachineSize": {
             "value":"VM_SIZE"
@@ -26,6 +28,7 @@
         "adminUsername": {
             "value":"VM_LOCAL_ADMIN_USERNAME"
         },
+        /* This example shows how to reference a password stored in Azure Key Vault but this could be passed as a simple secure string */
         "adminPassword": {
             "reference": {
                 "keyVault": {
@@ -35,15 +38,7 @@
                 "secretVersion": "<SECRET_VERSION>"
             }
         },
-        "createAppSecGroup": {
-            "value":"CREATE_NEW_APPSECGROUP_OR_USE_EXISTING"
-        },
-        "appSecGroup": {
-            "value": "<APPSECGROUP_NAME>"
-        },
-        "appSecResourceGroup": {
-            "value": "<EXISTING_APPSECGROUP_RESOURCE_GROUP_NAME>"
-        },
+        /* This example shows how to reference a Log Analytics Workspace Id stored in Azure Key Vault but this could be passed as a standard string */
         "myWorkspaceId": {
             "reference": {
                 "keyVault": {
@@ -53,6 +48,7 @@
                 "secretVersion": "<SECRET_VERSION>"
             }
         },
+        /* This example shows how to reference a Log Analytics Workspace Key stored in Azure Key Vault but this could be passed as a standard string */
         "myWorkspaceKey": {
             "reference": {
                 "keyVault": {
@@ -60,6 +56,15 @@
                 },
                 "secretName": "<LOG_ANALYTICS_WORKSPACE_SECRET>",
                 "secretVersion": "<SECRET_VERSION>"
+            }
+        },
+        "availabilityZone": {
+            "value":"AVAILABILITY_ZONE_ID"
+        },
+        "tagValues": {
+            "value": {
+                "TAG1": "VALUE",
+                "TAG2": "VALUE"
             }
         }
     }

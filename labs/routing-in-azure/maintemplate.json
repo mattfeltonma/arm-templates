@@ -661,21 +661,6 @@
                                     ]
                                 },
                                 {
-                                    "name": "RdpIntraSpoke",
-                                    "protocols": [
-                                        "TCP"
-                                    ],
-                                    "sourceAddresses": [
-                                        "[parameters('spokeAppSubnetCidrs')[0]]"
-                                    ],
-                                    "destinationAddresses": [
-                                        "[parameters('spokeDataSubnetCidrs')[0]]"
-                                    ],
-                                    "destinationPorts": [
-                                        "3389"
-                                    ]
-                                },
-                                {
                                     "name": "RdpInterSpoke",
                                     "protocols": [
                                         "TCP"
@@ -887,7 +872,7 @@
             "resources": [
             ]
         },
-        /* Create two URDs (User Defined Routes) for the route table applied to the primary and secondary
+        /* Create two UDRs (User Defined Routes) for the route table applied to the primary and secondary
         subnets in the hub Virtual Network to route destinated to the spoke Virtual Networks to Azure Firewall */
         {
             "name": "[concat(parameters('hubRouteTable'),'/','udr-spoke',copyIndex(1))]",
@@ -907,7 +892,7 @@
                 "count": "[length(parameters('spokeCidrs'))]"
             }
         },
-        /* Create two URDs (User Defined Routes) for the route table applied to the Gateway Subnet
+        /* Create two UDRs (User Defined Routes) for the route table applied to the Gateway Subnet
         in the hub Virtual Network to route destinated to the spoke Virtual Networks to Azure Firewall */
         {
             "name": "[concat(parameters('hubVNGRouteTable'),'/','udr-spoke',copyIndex(1))]",
@@ -1449,5 +1434,31 @@
                 ]
             }
         }
-    ]
+    ],
+    "outputs": {
+        "VmHubPrimaryIp": {
+            "type": "string",
+            "value": "[reference('vmhp01').outputs.privateIp.value]"
+        },
+        "VmHubSecondary1Ip": {
+            "type": "string",
+            "value": "[reference('vmhs01').outputs.privateIp.value]"
+        },
+        "VmHubSecondary2Ip": {
+            "type": "string",
+            "value": "[reference('vmhs01').outputs.privateIp.value]"
+        },
+        "VmOnPremisesIp": {
+            "type": "string",
+            "value": "[reference('vmop01').outputs.privateIp.value]"
+        },
+        "VmSpoke1AppIp": {
+            "type": "string",
+            "value": "[reference('vmsa01').outputs.privateIp.value]"
+        },
+        "VmSpoke2AppIp": {
+            "type": "string",
+            "value": "[reference('vmsa02').outputs.privateIp.value]"
+        }
+    }
 }
