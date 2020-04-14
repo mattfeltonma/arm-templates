@@ -22,9 +22,6 @@
         "virtualMachineSize": {
             "value":"VM_SIZE"
         },
-        "privateIp": {
-            "value": "VM_STATIC_IP"
-        },
         "adminUsername": {
             "value":"VM_LOCAL_ADMIN_USERNAME"
         },
