@@ -231,7 +231,7 @@
     "outputs": {
         "vmPrivateIpAddress": {
             "type": "string",
-            "value": "[reference(variables('nicName')).ipConfigurations[0].properties.privateIPAddress]]"
+            "value": "[reference(variables('nicName')).ipConfigurations[0].properties.privateIPAddress]"
         }
     }
 }
