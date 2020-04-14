@@ -1438,27 +1438,27 @@
     "outputs": {
         "VmHubPrimaryIp": {
             "type": "string",
-            "value": "[reference('vmhp01').outputs.privateIp.value]"
+            "value": "[reference('vmhp01').outputs.vmPrivateIpAddress.value]"
         },
         "VmHubSecondary1Ip": {
             "type": "string",
-            "value": "[reference('vmhs01').outputs.privateIp.value]"
+            "value": "[reference('vmhs01').outputs.vmPrivateIpAddress.value]"
         },
         "VmHubSecondary2Ip": {
             "type": "string",
-            "value": "[reference('vmhs01').outputs.privateIp.value]"
+            "value": "[reference('vmhs01').outputs.vmPrivateIpAddress.value]"
         },
         "VmOnPremisesIp": {
             "type": "string",
-            "value": "[reference('vmop01').outputs.privateIp.value]"
+            "value": "[reference('vmop01').outputs.vmPrivateIpAddress.value]"
         },
         "VmSpoke1AppIp": {
             "type": "string",
-            "value": "[reference('vmsa01').outputs.privateIp.value]"
+            "value": "[reference('vmsa01').outputs.vmPrivateIpAddress.value]"
         },
         "VmSpoke2AppIp": {
             "type": "string",
-            "value": "[reference('vmsa02').outputs.privateIp.value]"
+            "value": "[reference('vmsa02').outputs.vmPrivateIpAddress.value]"
         }
     }
 }
