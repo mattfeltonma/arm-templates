@@ -1,0 +1,33 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "hubVnetName": {
+            "value": "vm-test"
+        },
+        "spokeVnetName": {
+            "value": "vnet-spoke1"
+        },
+        "spokeVnetCidr": {
+            "value": "10.1.0.0/16"
+        },
+        "spokeAppSubnetName": {
+            "value": "snet-app"
+        },
+        "spokeDataSubnetName": {
+            "value": "snet-data"
+        },
+        "spokeAppSubnetCidr": {
+            "value": "10.1.0.0/24"
+        },
+        "spokeDataSubnetCidr": {
+            "value": "10.1.1.0/24"
+        },
+        "dnsServers": {
+            "value": [
+                "10.0.0.10",
+                "10.0.0.11"
+            ]
+        }
+    }
+}

@@ -1,0 +1,149 @@
+{
+    "$schema":"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion":"1.0.0.0",
+    "parameters": {
+        "hubVnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of Hub Virtual Network"
+            }
+        },
+        "hubVnetSubscriptionId": {
+            "type": "string",
+            "defaultValue": "[subscription().subscriptionId]",
+            "metadata": {
+                "description": "The subscription of the Hub Virtual Network if different from where the spoke will be created."
+            }
+        },
+        "hubVnetResourceGroup": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().name]",
+            "metadata": {
+                "description": "The resource group of the Hub Virtual Network if different from where the spoke will be created."
+            }
+        },
+        "spokeVnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of Spoke Virtual Network"
+            }
+        },
+        "spokeVnetCidr": {
+            "type": "string",
+            "metadata": {
+                "description": "CIDR block assigned to the spoke Virtual Network"
+            }
+        },
+        "spokeAppSubnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "CIDR block assigned to the spoke Virtual Network"
+            },
+            "defaultValue": "snet-app"
+        },
+        "spokeDataSubnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "CIDR block assigned to the spoke Virtual Network"
+            },
+            "defaultValue": "snet-data"
+        },
+        "spokeAppSubnetCidr": {
+            "type": "string",
+            "metadata": {
+                "description": "CIDR block assigned to the spoke application subnet"
+            }
+        },
+        "spokeDataSubnetCidr": {
+            "type": "string",
+            "metadata": {
+                "description": "CIDR block assigned to the spoke data subnet"
+            }
+        },
+        "dnsServers": {
+            "type":"array",
+            "metadata": {
+                "description": "The DNS servers configured on the spoke Virtual Network"
+            },
+            "maxLength": 2
+        }
+    },
+    "variables": {
+        "location": "[resourceGroup().location]",
+        "networkApiVersion": "2019-09-01",
+        "hubToSpokePeeringName": "[concat('hubTo',parameters('spokeVnetName'))]",
+        "spokeToHubPeeringName": "[concat(parameters('spokeVnetName'),'ToHub')]"        
+    },
+    "resources" : [
+        /* Create the spoke Virtual Network and the spoke side of the Virtual Network Peering */
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters('spokeVnetName')]",
+            "apiVersion": "[variables('networkApiVersion')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('spokeVnetCidr')]"
+                    ]
+                },
+                "dhcpOptions": {
+                    "dnsServers": "[parameters('dnsServers')]"
+                },
+                "subnets": [
+                    {
+                        "name": "[parameters('spokeAppSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('spokeAppSubnetCidr')]"
+                        }
+                    },
+                    {
+                        "name": "[parameters('spokeDataSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('spokeDataSubnetCidr')]"
+                        }
+                    }
+                ],
+                "enableDdosProtection": false
+            },
+            "resources": [
+                {
+                    "name": "[variables('spokeToHubPeeringName')]",
+                    "type": "virtualNetworkPeerings",
+                    "apiVersion": "[variables('networkApiVersion')]",
+                    "location": "[resourceGroup().location]",
+                    "dependsOn": [
+                        "[concat('Microsoft.Network/virtualNetworks/', parameters('spokeVnetName'))]"
+                    ],
+                    "properties": {
+                        "allowVirtualNetworkAccess": "true",
+                        "allowForwardedTraffic": "true",
+                        "allowGatewayTransit": "false",
+                        "useRemoteGateways": "false",
+                        "remoteVirtualNetwork": {
+                            "id": "[resourceId(parameters('hubVnetSubscriptionId'),parameters('hubVnetResourceGroup'),'Microsoft.Network/virtualNetworks',parameters('hubVnetName'))]"
+                        }
+                    }
+                }
+            ]
+        },
+        /* Create the hub side of the Virtual Network Peering */
+        {
+            "name": "[concat(parameters('hubVnetName'),'/',variables('hubToSpokePeeringName'))]",
+            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+            "apiVersion": "[variables('networkApiVersion')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('spokeVnetName'))]"
+            ],
+            "properties": {
+                "allowVirtualNetworkAccess": "true",
+                "allowForwardedTraffic": "true",
+                "allowGatewayTransit": "false",
+                "remoteVirtualNetwork": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworks',concat(parameters('spokeVnetName')))]"
+                }
+            }
+        }
+    ]   
+}
+  
