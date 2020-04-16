@@ -141,7 +141,6 @@
             "name": "hubPeeringNestedTemplate",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('resourceApiVersion')]",
-            "location": "[parameters('hubVnetLocation')]",
             "subscriptionId": "[parameters('hubVnetSubscriptionId')]",
             "resourceGroup": "[parameters('hubVnetResourceGroup')]",
             "dependsOn": [
