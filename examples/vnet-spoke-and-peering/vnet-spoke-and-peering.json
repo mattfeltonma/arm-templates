@@ -22,12 +22,6 @@
                 "description": "The resource group of the Hub Virtual Network if different from where the spoke will be created."
             }
         },
-        "hubVnetLocation": {
-            "type": "string",
-            "metadata": {
-                "description": "Location for the Hub Virtual Network"
-            }
-        },
         "spokeVnetName": {
             "type": "string",
             "metadata": {
