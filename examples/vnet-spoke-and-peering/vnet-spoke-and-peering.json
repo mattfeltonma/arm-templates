@@ -1,6 +1,6 @@
 {
-    "$schema":"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion":"1.0.0.0",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
     "parameters": {
         "hubVnetName": {
             "type": "string",
@@ -20,6 +20,12 @@
             "defaultValue": "[resourceGroup().name]",
             "metadata": {
                 "description": "The resource group of the Hub Virtual Network if different from where the spoke will be created."
+            }
+        },
+        "hubVnetLocation": {
+            "type": "string",
+            "metadata": {
+                "description": "Location for the Hub Virtual Network"
             }
         },
         "spokeVnetName": {
@@ -61,7 +67,7 @@
             }
         },
         "dnsServers": {
-            "type":"array",
+            "type": "array",
             "metadata": {
                 "description": "The DNS servers configured on the spoke Virtual Network"
             },
@@ -71,10 +77,13 @@
     "variables": {
         "location": "[resourceGroup().location]",
         "networkApiVersion": "2019-09-01",
+        "resourceApiVersion": "2019-10-01",
         "hubToSpokePeeringName": "[concat('hubTo',parameters('spokeVnetName'))]",
-        "spokeToHubPeeringName": "[concat(parameters('spokeVnetName'),'ToHub')]"        
+        "spokeToHubPeeringName": "[concat(parameters('spokeVnetName'),'ToHub')]",
+        "spokeSubscriptionId": "[subscription().subscriptionId]",
+        "spokeResourceGroup": "[resourceGroup().name]"
     },
-    "resources" : [
+    "resources": [
         /* Create the spoke Virtual Network and the spoke side of the Virtual Network Peering */
         {
             "type": "Microsoft.Network/virtualNetworks",
@@ -129,21 +138,41 @@
         },
         /* Create the hub side of the Virtual Network Peering */
         {
-            "name": "[concat(parameters('hubVnetName'),'/',variables('hubToSpokePeeringName'))]",
-            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
-            "apiVersion": "[variables('networkApiVersion')]",
+            "name": "hubPeeringNestedTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('resourceApiVersion')]",
+            "location": "[parameters('hubVnetLocation')]",
+            "subscriptionId": "[parameters('hubVnetSubscriptionId')]",
+            "resourceGroup": "[parameters('hubVnetResourceGroup')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/virtualNetworks/', parameters('spokeVnetName'))]"
+                "[concat('Microsoft.Network/virtualNetworks', parameters('spokeVnetName'))]"
             ],
             "properties": {
-                "allowVirtualNetworkAccess": "true",
-                "allowForwardedTraffic": "true",
-                "allowGatewayTransit": "false",
-                "remoteVirtualNetwork": {
-                    "id": "[resourceId('Microsoft.Network/virtualNetworks',concat(parameters('spokeVnetName')))]"
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                    },
+                    "variables": {
+                    },
+                    "resources": [
+                        {
+                            "name": "[concat(parameters('hubVnetName'),'/',variables('hubToSpokePeeringName'))]",
+                            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+                            "apiVersion": "[variables('networkApiVersion')]",
+                            "properties": {
+                                "allowVirtualNetworkAccess": "true",
+                                "allowForwardedTraffic": "true",
+                                "allowGatewayTransit": "false",
+                                "remoteVirtualNetwork": {
+                                    "id": "[resourceId(variables('spokeSubscriptionId'),variables('spokeResourceGroup'),'Microsoft.Network/virtualNetworks',parameters('spokeVnetName'))]"
+                                }
+                            }
+                        }
+                    ]
                 }
             }
         }
-    ]   
+    ]
 }
-  
