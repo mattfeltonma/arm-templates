@@ -166,7 +166,7 @@
                                 "allowForwardedTraffic": "true",
                                 "allowGatewayTransit": "false",
                                 "remoteVirtualNetwork": {
-                                    "id": "[resourceId(variables('spokeSubscriptionId'),variables('spokeResourceGroup'),'Microsoft.Network/virtualNetworks/',parameters('spokeVnetName'))]"
+                                    "id": "[resourceId(variables('spokeSubscriptionId'),variables('spokeResourceGroup'),'Microsoft.Network/virtualNetworks',parameters('spokeVnetName'))]"
                                 }
                             }
                         }
