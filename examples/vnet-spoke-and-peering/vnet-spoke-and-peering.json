@@ -145,7 +145,7 @@
             "subscriptionId": "[parameters('hubVnetSubscriptionId')]",
             "resourceGroup": "[parameters('hubVnetResourceGroup')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/virtualNetworks', parameters('spokeVnetName'))]"
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('spokeVnetName'))]"
             ],
             "properties": {
                 "mode": "Incremental",
