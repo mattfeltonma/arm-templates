@@ -231,12 +231,19 @@
             },
             "defaultValue": "fwhub"
         },
-        "hubRouteTable": {
+        "hubPriRouteTable": {
             "type": "string",
             "metadata": {
-                "description": "The name assigned to the Route Table assigned to the primary and secondary subnets in the hub Virtual Network"
+                "description": "The name assigned to the Route Table assigned to the primary subnet in the hub Virtual Network"
             },
-            "defaultValue": "rt-hub"
+            "defaultValue": "rt-hub-pri"
+        },
+        "hubSecRouteTable": {
+            "type": "string",
+            "metadata": {
+                "description": "The name assigned to the Route Table assigned to the secondary subnet in the hub Virtual Network"
+            },
+            "defaultValue": "rt-hub-sec"
         },
         "hubVngRouteTable": {
             "type": "string",
@@ -823,9 +830,9 @@
             "resources": [
             ]
         },
-        /* Create a Route Table for the primary and secondary subnets in the hub Virtual Network */
+        /* Create a Route Table for the primary subnet in the hub Virtual Network */
         {
-            "name": "[parameters('hubRouteTable')]",
+            "name": "[parameters('hubPriRouteTable')]",
             "type": "Microsoft.Network/routeTables",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
@@ -854,6 +861,63 @@
                         "name": "udr-hub",
                         "properties": {
                             "addressPrefix": "[parameters('hubCidr')]",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
+                        }
+                    },
+                    {
+                        "name": "udr-onprem",
+                        "properties": {
+                            "addressPrefix": "[parameters('onpremCidr')]",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
+                        }
+                    }
+                ],
+                "disableBgpRoutePropagation": "False"
+            },
+            "resources": [
+            ]
+        },
+        /* Create a Route Table for the secondary subnet in the hub Virtual Network */
+        {
+            "name": "[parameters('hubSecRouteTable')]",
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "[variables('netApiVersionNum')]",
+            "location": "[variables('location')]",
+            "tags": "[parameters('tags')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/azureFirewalls/',parameters('azureFirewallName'))]"
+            ],
+            "properties": {
+                "routes": [
+                    {
+                        "name": "udr-default",
+                        "properties": {
+                            "addressPrefix": "0.0.0.0/0",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
+                        }
+                    },
+                    {
+                        "name": "udr-bastion",
+                        "properties": {
+                            "addressPrefix": "[parameters('hubBastionSubnetCidr')]",
+                            "nextHopType": "VnetLocal"
+                        }
+                    },
+                    {
+                        "name": "udr-hub",
+                        "properties": {
+                            "addressPrefix": "[parameters('hubCidr')]",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
+                        }
+                    },
+                    {
+                        "name": "udr-sec",
+                        "properties": {
+                            "addressPrefix": "[parameters('hubSecondarySubnetCidr')]",
                             "nextHopType": "VirtualAppliance",
                             "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }
@@ -953,7 +1017,8 @@
             "type": "Microsoft.Resources/deployments",
             "dependsOn": [
                 "[concat('Microsoft.Network/virtualNetworkGateways/', parameters('hubVngName'))]",
-                "[concat('Microsoft.Network/routeTables/', parameters('hubRouteTable'))]",
+                "[concat('Microsoft.Network/routeTables/', parameters('hubPriRouteTable'))]",
+                "[concat('Microsoft.Network/routeTables/', parameters('hubSecRouteTable'))]",
                 "[concat('Microsoft.Network/routeTables/', parameters('hubVNGRouteTable'))]",
                 "[concat('Microsoft.Network/routeTables/', parameters('spokeRouteTable'))]"
             ],
@@ -969,8 +1034,11 @@
                     "hubGatewaySubnetRouteTableId": {
                         "value": "[resourceId('Microsoft.Network/routeTables',parameters('hubVNGRouteTable'))]"
                     },
-                    "hubRouteTableId": {
-                        "value": "[resourceId('Microsoft.Network/routeTables',parameters('hubRouteTable'))]"
+                    "hubPriRouteTableId": {
+                        "value": "[resourceId('Microsoft.Network/routeTables',parameters('hubPriRouteTable'))]"
+                    },
+                    "hubSecRouteTableId": {
+                        "value": "[resourceId('Microsoft.Network/routeTables',parameters('hubSecRouteTable'))]"
                     },
                     "spokeRouteTableId": {
                         "value": "[resourceId('Microsoft.Network/routeTables',parameters('spokeRouteTable'))]"
@@ -1040,7 +1108,10 @@
                         "hubGatewaySubnetRouteTableId": {
                             "type": "string"
                         },
-                        "hubRouteTableId": {
+                        "hubPriRouteTableId": {
+                            "type": "string"
+                        },
+                        "hubSecRouteTableId": {
                             "type": "string"
                         },
                         "spokeRouteTableId": {
@@ -1087,7 +1158,7 @@
                             "properties": {
                                 "addressPrefix": "[parameters('hubPrimarySubnetCidr')]",
                                 "routeTable": {
-                                    "id": "[parameters('hubRouteTableId')]"
+                                    "id": "[parameters('hubPriRouteTableId')]"
                                 }
                             }
                         },
@@ -1101,7 +1172,7 @@
                             "properties": {
                                 "addressPrefix": "[parameters('hubSecondarySubnetCidr')]",
                                 "routeTable": {
-                                    "id": "[parameters('hubRouteTableId')]"
+                                    "id": "[parameters('hubSecRouteTableId')]"
                                 }
                             }
                         },
