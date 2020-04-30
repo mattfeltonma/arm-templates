@@ -936,15 +936,15 @@
             "resources": [
             ]
         },
-        /* Create two UDRs (User Defined Routes) for the route table applied to the primary and secondary
-        subnets in the hub Virtual Network to route destinated to the spoke Virtual Networks to Azure Firewall */
+        /* Create two UDRs (User Defined Routes) for the route table applied to the primary
+        subnet in the hub Virtual Network to route destinated to the spoke Virtual Networks to Azure Firewall */
         {
-            "name": "[concat(parameters('hubRouteTable'),'/','udr-spoke',copyIndex(1))]",
+            "name": "[concat(parameters('hubPriRouteTable'),'/','udr-spoke',copyIndex(1))]",
             "type": "Microsoft.Network/routeTables/routes",
             "apiVersion": "[variables('netApiVersionNum')]",
             "location": "[variables('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/routeTables/', parameters('hubRouteTable'))]"
+                "[concat('Microsoft.Network/routeTables/', parameters('hubPriRouteTable'))]"
             ],
             "properties": {
                 "addressPrefix": "[parameters('spokeCidrs')[copyIndex()]]",
@@ -952,7 +952,27 @@
                 "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
             },
             "copy": {
-                "name": "copyspokerouteshub",
+                "name": "copyspokerouteshubpri",
+                "count": "[length(parameters('spokeCidrs'))]"
+            }
+        },
+        /* Create two UDRs (User Defined Routes) for the route table applied to the secondary
+        subnet in the hub Virtual Network to route destinated to the spoke Virtual Networks to Azure Firewall */
+        {
+            "name": "[concat(parameters('hubSecRouteTable'),'/','udr-spoke',copyIndex(1))]",
+            "type": "Microsoft.Network/routeTables/routes",
+            "apiVersion": "[variables('netApiVersionNum')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/routeTables/', parameters('hubSecRouteTable'))]"
+            ],
+            "properties": {
+                "addressPrefix": "[parameters('spokeCidrs')[copyIndex()]]",
+                "nextHopType": "VirtualAppliance",
+                "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
+            },
+            "copy": {
+                "name": "copyspokerouteshubsec",
                 "count": "[length(parameters('spokeCidrs'))]"
             }
         },
@@ -1271,7 +1291,8 @@
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/virtualNetworks/', parameters('hubVnetName'))]",
-                "[concat('Microsoft.Network/routeTables/', parameters('hubRouteTable'))]",
+                "[concat('Microsoft.Network/routeTables/', parameters('hubPriRouteTable'))]",
+                "[concat('Microsoft.Network/routeTables/', parameters('hubSecRouteTable'))]",
                 "[concat('Microsoft.Network/azureFirewalls/', parameters('azureFirewallName'))]",
                 "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]",
                 "Microsoft.Resources/deployments/routeAssignment"
@@ -1320,7 +1341,8 @@
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/virtualNetworks/', parameters('hubVnetName'))]",
-                "[concat('Microsoft.Network/routeTables/', parameters('hubRouteTable'))]",
+                "[concat('Microsoft.Network/routeTables/', parameters('hubPriRouteTable'))]",
+                "[concat('Microsoft.Network/routeTables/', parameters('hubSecRouteTable'))]",
                 "[concat('Microsoft.Network/azureFirewalls/',parameters('azureFirewallName'))]",
                 "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]",
                 "Microsoft.Resources/deployments/routeAssignment"
@@ -1426,7 +1448,8 @@
                 "[concat('Microsoft.Network/virtualNetworks/', parameters('spokeVnetName'), copyIndex(1))]",
                 "[concat(concat('Microsoft.Network/virtualNetworks/', parameters('spokeVnetName'), copyIndex(1)),'/virtualNetworkPeerings/',variables('spokeToHubPeeringName'))]",
                 "[concat('Microsoft.Network/virtualNetworks/',parameters('hubVnetName'),'/virtualNetworkPeerings/',variables('hubToSpokePeeringName'),copyIndex(1))]",
-                "[concat(concat('Microsoft.Network/routeTables/',parameters('hubRouteTable')),'/routes/',concat('udr-spoke',copyIndex(1)))]",
+                "[concat(concat('Microsoft.Network/routeTables/',parameters('hubPriRouteTable')),'/routes/',concat('udr-spoke',copyIndex(1)))]",
+                "[concat(concat('Microsoft.Network/routeTables/',parameters('hubSecRouteTable')),'/routes/',concat('udr-spoke',copyIndex(1)))]",
                 "[concat('Microsoft.Network/routeTables/',parameters('spokeRouteTable'))]",
                 "[concat('Microsoft.Network/azureFirewalls/', parameters('azureFirewallName'))]",
                 "[concat('Microsoft.OperationalInsights/workspaces/', variables('laWorkspaceName'))]",
