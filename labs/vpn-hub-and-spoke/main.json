@@ -95,8 +95,8 @@
                 "description": "The CIDR blocks assigned to the spoke application subnets"
             },
             "defaultValue": [
-                "10.2.0.0/24",
-                "10.3.0.0/24"
+                "10.1.0.0/24",
+                "10.2.0.0/24"
             ],
             "maxLength": 2
         },
@@ -266,7 +266,7 @@
                 },
                 "subnets": [
                     {
-                        "name": "[concat(parameters('primarySubnetName'),copyIndex(1))]",
+                        "name": "[parameters('primarySubnetName')]",
                         "properties": {
                             "addressPrefix": "[concat(parameters('spokePrimarySubnetCidrs')[copyIndex()])]"
                         }
