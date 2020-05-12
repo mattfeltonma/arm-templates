@@ -509,7 +509,7 @@
                 "[concat('Microsoft.Network/virtualNetworks/', parameters('spokeVnetName'), copyIndex(1))]",
                 "[concat(concat('Microsoft.Network/virtualNetworks/', parameters('spokeVnetName'), copyIndex(1)),'/virtualNetworkPeerings/',variables('spokeToHubPeeringName'))]",
                 "[concat('Microsoft.Network/virtualNetworks/',parameters('hubVnetName'),'/virtualNetworkPeerings/',variables('hubToSpokePeeringName'),copyIndex(1))]",
-                "[concat('Microsoft.Network/routeTables/',parameters('spokeRouteTable'))]"
+                "[concat('Microsoft.Network/routeTables/',parameters('spokeRouteTable'))]",
                 "[concat('Microsoft.Network/connections/',variables('hubVngConnName'))]"
             ],
             "properties": {
