@@ -568,9 +568,7 @@
             "dependsOn": [
                 "[concat('Microsoft.Network/publicIpAddresses/',parameters('bastionPublicIpName'))]",
                 "[concat('Microsoft.Network/virtualNetworks/',parameters('hubVnetName'))]",
-                "Microsoft.Resources/deployments/vmh01",
-                "Microsoft.Resources/deployments/vms01",
-                "Microsoft.Resources/deployments/vms02"
+                "[concat('Microsoft.Resources/deployments/',parameters('hubVmName'))]"
             ],
             "tags": "[parameters('tags')]",
             "properties": {
