@@ -186,6 +186,20 @@
                 "description": "The name assigned to the Route Table assigned to the application and data subnets in the spoke Virtual Network"
             },
             "defaultValue": "rt-spoke"
+        },
+        "hubVmName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name assigned to the VM in the primary subnet in the hub VNet"
+            },
+            "defaultValue": "vmhp01"
+        },
+        "spokeVmName": {
+            "type": "string",
+            "metadata": {
+                "description": "The naming prefix assigned to the VMs in the spokes VNets"
+            },
+            "defaultValue": "vmsp0"
         }
     },
     "variables": {
@@ -461,7 +475,7 @@
         },
         /* Deploy a VM into the primary subnet in the hub Virtual Network */
         {
-            "name": "vmh01",
+            "name": "[parameters('hubVmName')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "dependsOn": [
@@ -474,7 +488,7 @@
                         "value": "[parameters('tags')]"
                     },
                     "vmName": {
-                        "value": "vmhubprim"
+                        "value": "[parameters('hubVmName')]"
                     },
                     "vnetName": {
                         "value": "[parameters('hubVnetName')]"
@@ -500,7 +514,7 @@
         },
         /* Deploy a VM into the primary subnet in each spoke Virtual Network */
         {
-            "name": "[concat('vms0',copyIndex(1))]",
+            "name": "[concat(parameters('spokeVmName'),copyIndex(1))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
             "dependsOn": [
@@ -517,7 +531,7 @@
                         "value": "[parameters('tags')]"
                     },
                     "vmName": {
-                        "value": "[concat('vmspoke',copyIndex(1),'app')]"
+                        "value": "[concat(parameters('spokeVmName'),copyIndex(1))]"
                     },
                     "vnetName": {
                         "value": "[concat(parameters('spokeVnetName'),copyIndex(1))]"
