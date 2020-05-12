@@ -493,7 +493,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/mattfeltonma/arm-templates/master/examples/vm-windows-server-2016-no-extensions/vm-win-2016-no-ext.json",
+                    "uri": "https://raw.githubusercontent.com/mattfeltonma/arm-templates/master/examples/vm-windows-server-2016-no-ext/vm-win-2016-no-ext.json",
                     "contentVersion": "1.0.0.0"
                 }
             }
@@ -536,7 +536,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/mattfeltonma/arm-templates/master/examples/vm-windows-server-2016/vm-win-2016.json",
+                    "uri": "https://raw.githubusercontent.com/mattfeltonma/arm-templates/master/examples/vm-windows-server-2016-no-ext/vm-win-2016-no-ext.json",
                     "contentVersion": "1.0.0.0"
                 }
             },
