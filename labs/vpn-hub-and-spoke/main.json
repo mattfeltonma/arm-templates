@@ -592,15 +592,15 @@
     "outputs": {
         "VmHubVmIp": {
             "type": "string",
-            "value": "[reference('vmh01').outputs.vmPrivateIpAddress.value]"
+            "value": "[reference(parameters('hubVmName')).outputs.vmPrivateIpAddress.value]"
         },
         "VmSpoke1VmIp": {
             "type": "string",
-            "value": "[reference('vms01').outputs.vmPrivateIpAddress.value]"
+            "value": "[reference(concat(parameters('spokeVmName'),'1').outputs.vmPrivateIpAddress.value]"
         },
         "VmSpoke2VmIp": {
             "type": "string",
-            "value": "[reference('vms02').outputs.vmPrivateIpAddress.value]"
+            "value": "[reference(concat(parameters('spokeVmName'),'2').outputs.vmPrivateIpAddress.value]"
         }
     }
 }
