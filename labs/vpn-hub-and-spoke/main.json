@@ -420,7 +420,6 @@
                 "[concat('Microsoft.Network/virtualNetworks/', parameters('hubVnetName'))]",
                 "[concat('Microsoft.Network/virtualNetworks/', parameters('spokeVnetName'),copyIndex(1))]",
                 "[concat('Microsoft.Network/virtualNetworkGateways/', parameters('hubVngName'))]",
-                "Microsoft.Resources/deployments/routeAssignment"
             ],
             "properties": {
                 "allowVirtualNetworkAccess": "true",
@@ -444,8 +443,7 @@
             "dependsOn": [
                 "[concat('Microsoft.Network/virtualNetworks/', parameters('hubVnetName'))]",
                 "[concat('Microsoft.Network/virtualNetworks/', parameters('spokeVnetName'),copyIndex(1))]",
-                "[concat('Microsoft.Network/virtualNetworkGateways/', parameters('hubVngName'))]",
-                "Microsoft.Resources/deployments/routeAssignment"
+                "[concat('Microsoft.Network/virtualNetworkGateways/', parameters('hubVngName'))]"
             ],
             "properties": {
                 "allowVirtualNetworkAccess": "true",
