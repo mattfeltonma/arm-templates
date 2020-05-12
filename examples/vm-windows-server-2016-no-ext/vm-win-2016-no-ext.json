@@ -77,7 +77,7 @@
         "storageApiVersion": "2019-06-01",
         "resourceDeploymentsApiVersion": "2019-10-01",
         "location": "[resourceGroup().location]",
-        "diagAcctName": "[concat('st',uniqueString(subscription().id,resourceGroup().name),parameters('vmName')))]",
+        "diagAcctName": "[concat('st',uniqueString(subscription().id,deployment().name),parameters('vmName'))]",
         "nicName": "[concat(parameters('vmName'),uniqueString(resourceGroup().id))]",
         "subnetRef": "[resourceId(parameters('vnetSubscriptionId'),parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks/subnets',parameters('vnetName'),parameters('subnetName'))]"
     },
