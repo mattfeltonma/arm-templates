@@ -596,11 +596,11 @@
         },
         "VmSpoke1VmIp": {
             "type": "string",
-            "value": "[reference(concat(parameters('spokeVmName'),'1').outputs.vmPrivateIpAddress.value]"
+            "value": "[reference(concat(parameters('spokeVmName'),'1')).outputs.vmPrivateIpAddress.value]"
         },
         "VmSpoke2VmIp": {
             "type": "string",
-            "value": "[reference(concat(parameters('spokeVmName'),'2').outputs.vmPrivateIpAddress.value]"
+            "value": "[reference(concat(parameters('spokeVmName'),'2')).outputs.vmPrivateIpAddress.value]"
         }
     }
 }
