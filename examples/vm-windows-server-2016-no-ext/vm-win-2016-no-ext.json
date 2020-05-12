@@ -52,18 +52,6 @@
                 "description": "The password for the administrator account created on the VM"
             }
         },
-        "myWorkspaceId": {
-            "type": "string",
-            "metadata": {
-                "description": "The Log and Analytics workspace ID that the Microsoft Monitoring Agent will deliver metrics and logs to"
-            }
-        },
-        "myWorkspaceKey": {
-            "type": "string",
-            "metadata": {
-                "description": "The Log and Analytics workspace secret"
-            }
-        },
         "availabilityZone": {
             "type": "int",
             "defaultValue": 1,
