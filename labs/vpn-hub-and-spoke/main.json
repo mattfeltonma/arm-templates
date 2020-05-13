@@ -342,9 +342,7 @@
             ],
             "properties": {
                 "localNetworkAddressSpace": {
-                    "addressPrefixes": [
-                        "[parameters('bgpPeerPrefixes')]"
-                    ]
+                    "addressPrefixes": "[parameters('bgpPeerPrefixes')]"
                 },
                 "gatewayIpAddress": "[parameters('lgwPublicIPAddress')]",
                 "bgpSettings": {
