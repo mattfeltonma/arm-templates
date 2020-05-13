@@ -535,7 +535,7 @@
                         "value": "[concat(parameters('spokeVnetName'),copyIndex(1))]"
                     },
                     "subnetName": {
-                        "value": "[concat(parameters('primarySubnetName'),copyIndex(1))]"
+                        "value": "[parameters('primarySubnetName')]"
                     },
                     "virtualMachineSize": {
                         "value": "[parameters('vmSku')]"
