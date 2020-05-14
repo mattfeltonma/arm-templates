@@ -494,7 +494,7 @@
                     /* Assign route table to spoke */
                     "resources": [
                         {
-                            "name": "[concat(parameters('spokeVnetName'),copyIndex(1),'/',parameters('primarySubnetName'),copyIndex(1))]",
+                            "name": "[concat(parameters('spokeVnetName'),copyIndex(1),'/',parameters('primarySubnetName'))]",
                             "type": "Microsoft.Network/virtualNetworks/subnets",
                             "apiVersion": "[parameters('networkApiVersion')]",
                             "properties": {
