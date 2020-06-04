@@ -1,0 +1,51 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "remoteVirtualNetworkId": {
+            "type": "string",
+            "metadata": {
+                "description": "The resource ID of the remote Virtual Network you want to link to the Private DNS Zone"
+            }
+        },
+        "privateDnsZoneName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the Azure Private DNS Zone"
+            }
+        },
+        "virtualNetworkLinkName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name assigned to the Virtual Network Link"
+            }
+        },
+        "enableRegistration": {
+            "type": "bool",
+            "metadata": {
+                "description": "Enable automatic registration"
+            },
+            "defaultValue": false  
+        }
+    },
+    "variables": {
+        "dnsApiVersion": "2018-09-01"
+
+    },
+    "resources": [
+        {
+            "name": "[concat(parameters('privateDnsZoneName'),'/',parameters('virtualNetworkLinkName'))]",
+            "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+            "apiVersion": "[variables('dnsApiVersion')]",
+            "tags": {
+            },
+            "location": "Global",
+            "properties": {
+                "virtualNetwork": {
+                    "id": "[parameters('remoteVirtualNetworkId')]"
+                },
+                "registrationEnabled": "[parameters('enableRegistration')]"
+            }
+        }
+    ]
+}
