@@ -27,7 +27,7 @@
             "value": "<SUBNET_CIDR>"
         },
         "repoUrl": {
-            "value": "https://github.com/<USER_NAME>/REPO.git"
+            "value": "https://github.com/<USER_NAME>/<REPO>.git"
         },
         "tags": {
             "value": {
