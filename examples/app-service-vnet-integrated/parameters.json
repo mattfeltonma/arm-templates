@@ -1,0 +1,39 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "appServicePlanName": {
+            "value": "<APP_SERVICE_NAME>"
+        },
+        "appServicePlanSku": {
+            "value": "S1"
+        },
+        "appServiceKind": {
+            "value": "Linux"
+        },
+        "LinuxFxVersion": {
+            "value": "PYTHON|3.8"
+        },
+        "appServiceName": {
+            "value": "<APP_SERVICE_NAME>"
+        },
+        "virtualNetworkName": {
+            "value": "<VIRTUAL_NETWORK_NAME>"
+        },
+        "subnetName": {
+            "value": "<SUBNET_NAME>)"
+        },
+        "subnetPrefix": {
+            "value": "<SUBNET_CIDR>"
+        },
+        "repoUrl": {
+            "value": "https://github.com/<USER_NAME>/REPO.git"
+        },
+        "tags": {
+            "value": {
+                "TAG1": "VALUE",
+                "TAG2": "VALUE"
+            }
+        }
+    }
+}

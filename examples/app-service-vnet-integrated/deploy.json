@@ -1,0 +1,178 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "appServicePlanName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name assigned to the App Service Plan"
+            },
+            "defaultValue": "sp-app"
+
+        },
+        "appServicePlanSku": {
+            "type": "string",
+            "metadata": {
+                "description": "The SKU of the App Service Plan"
+            },
+            "defaultValue": "S1"
+        },
+        "appServiceKind": {
+            "type": "string",
+            "metadata": {
+                "description": "The kind of App Service Plan such as Linux or Windows"
+            },
+            "defaultValue": "Linux"
+        },
+        "appServiceName": {
+            "type": "string",
+            "metadata": {
+                "description": "The App Service Name"
+            }          
+        },
+        "linuxFxVersion": {
+            "type": "string",
+            "metadata": {
+                "description": "The version of the Linux Plan"
+            },
+            "defaultValue": "PYTHON|3.8"               
+        },
+        "virtualNetworkName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the Virtual Network the Web App will be integrated with"
+            }         
+        },
+        "subnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "The subnet Azure App Services will use to integrate the app with the Virtual Network"
+            }         
+        },
+        "subnetPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "The address prefix associated with the subnet"
+            }                  
+        },
+        "repoUrl": {
+            "type": "string",
+            "metadata": {
+                "description": "The URL of the repo containing the code to be deployed"
+            }
+        },
+        "branch": {
+            "type": "string",
+            "metadata": {
+                "description": "The branch to deploy"
+            },
+            "defaultValue": "master"
+        },
+        "tags": {
+            "type": "object",
+            "metadata": {
+                "description": "The tags that will be associated to the VM"
+            },
+            "defaultValue": {
+                "sampletag": "samplevalue"
+            }
+        }
+    },
+    "variables": {
+        "location": "[resourceGroup().location]",
+        "webApiVersion": "2019-08-01",
+        "networkApiVersion": "2020-05-01"
+    },
+    "resources": [
+        /* Delegate the subnet to App Services */
+        {
+            "name": "[concat(parameters('virtualNetworkName'),'/',parameters('subnetName'))]",
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "[variables('networkApiVersion')]",
+            "properties": {
+                "addressPrefix": "[parameters('subnetPrefix')]",
+                "delegations": [
+                    {
+                        "name": "delegation",
+                        "properties": {
+                            "serviceName": "Microsoft.Web/serverFarms"
+                        }
+                    }
+                ]
+
+            }
+        },
+        /* Create an App Service Plan */
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "[variables('webApiVersion')]",
+            "name": "[parameters('appServicePlanName')]",
+            "location": "[variables('location')]",
+            "sku": {
+                "name": "[parameters('appServicePlanSku')]"
+            },
+            "kind": "[parameters('appServiceKind')]",
+            "properties": {
+                "reserved": true
+            }
+        },
+        /* Create a Web App */
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "[variables('webApiVersion')]",
+            "name": "[parameters('appServiceName')]",
+            "location": "[variables('location')]",
+            "kind": "app",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
+            ],
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
+                "clientAffinityEnabled": false,
+                "siteConfig": {
+                    "linuxFxVersion": "[parameters('linuxFxVersion')]",
+                    "alwaysOn": true
+                }
+            },
+            "resources": [
+                {
+                    "type": "config",
+                    "apiVersion": "[variables('webApiVersion')]",
+                    "name": "appsettings",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/sites', parameters('appServiceName'))]"
+                    ],
+                    "properties": {
+                        "WEBSITE_VNET_ROUTE_ALL": "1"
+                    }
+                },
+                {
+                    "type": "sourcecontrols",
+                    "apiVersion": "[variables('webApiVersion')]",
+                    "name": "web",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/sites', parameters('appServiceName'))]"
+                    ],
+                    "properties": {
+                        "repoUrl": "[parameters('repoURL')]",
+                        "branch": "[parameters('branch')]",
+                        "isManualIntegration": true
+                    }
+                },
+                {
+                    "name": "virtualNetwork",
+                    "type": "networkConfig",
+                    "apiVersion": "[variables('webApiVersion')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/sites', parameters('appServiceName'))]"
+                    ],
+                    "properties": {
+                        "subnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
+                        "swiftSupported": true
+                    }
+                }
+            ]
+        }
+    ]
+}

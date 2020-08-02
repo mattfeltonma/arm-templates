@@ -91,7 +91,7 @@
                 ]
             },
             "resources": [
-                /* Register an A record in the primary and secondary Private DNS Zones */
+                /* Register an A record in the Private DNS Zone */
                 {
                     "name": "default",
                     "type": "privateDnsZoneGroups",
