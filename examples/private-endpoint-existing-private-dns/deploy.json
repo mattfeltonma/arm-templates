@@ -1,0 +1,118 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "privateEndpointName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name assigned to the Private Endpoint"
+            }
+        },
+        "privateEndpointResourceId": {
+            "type": "string",
+            "metadata": {
+                "description": "The resource id of the resource that will be accessible through the Private Endpoint"
+            }
+        },
+        "privateEndpointSubResource": {
+            "type": "array",
+            "metadata": {
+                "description": "An array of strings of the ids of the sub-resource accessible through the Private Endpoint.  Examples include queue or blob"
+            }
+        },
+        "virtualNetworkName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the Virtual Network the Private Endpoint created in"
+            }
+        },
+        "subnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the Subnet in the Virtual Network the Private Endpoint will be created in"
+            }
+        },
+        "privateDnsZoneName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the Private DNS Zone. Example: blob.core.windows.net"
+            }
+        },
+        "privateDnsZoneRg": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the resource group containing Private DNS Zone"
+            },
+            "defaultValue": "[resourceGroup().name]"
+        },
+        "privateDnsZoneSubscriptionId": {
+            "type": "string",
+            "metadata": {
+                "description": "The id of the subscription containing the Private DNS Zone"
+            },
+            "defaultValue": "[subscription().subscriptionId]"
+        },
+        "tags": {
+            "type": "object",
+            "metadata": {
+                "description": "The tags that will be associated to the VM"
+            },
+            "defaultValue": {
+                "sampletag": "samplevalue"
+            }
+        }
+
+    },
+    "variables": {
+        "networkApiVersion": "2020-05-01",
+        "location": "[resourceGroup().location]"
+
+    },
+    "resources": [
+        /* Create Private Endpoint */
+        {
+            "name": "[parameters('privateEndpointName')]",
+            "type": "Microsoft.Network/privateEndpoints",
+            "apiVersion": "[variables('networkApiVersion')]",
+            "location": "[variables('location')]",
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "subnet": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',parameters('virtualNetworkName'),parameters('subnetName'))]"
+                },
+                "privateLinkServiceConnections": [
+                    {
+                        "name": "[parameters('privateEndpointName')]",
+                        "properties": {
+                            "privateLinkServiceId": "[parameters('privateEndpointResourceId')]",
+                            "groupIds": "[parameters('privateEndpointSubResource')]"
+                        }
+                    }
+                ]
+            },
+            "resources": [
+                /* Register an A record in the primary and secondary Private DNS Zones */
+                {
+                    "name": "default",
+                    "type": "privateDnsZoneGroups",
+                    "apiVersion": "[variables('networkApiVersion')]",
+                    "dependsOn": [
+                        "[concat('Microsoft.Network/privateEndpoints/',parameters('privateEndpointName'))]"
+                    ],
+                    "properties": {
+                        "privateDnsZoneConfigs": [
+                            {
+                                "name": "primary",
+                                "properties": {
+                                    "privateDnsZoneId": "[resourceId(parameters('privateDnsZoneSubscriptionId'),parameters('privateDnsZoneRg'),'Microsoft.Network/privateDnsZones',parameters('privateDnsZoneName'))]"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+
+        }   
+
+    ]
+}
