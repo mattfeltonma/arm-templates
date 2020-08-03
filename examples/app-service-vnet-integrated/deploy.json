@@ -124,7 +124,7 @@
             "location": "[variables('location')]",
             "kind": "app",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
+                "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
             ],
             "tags": "[parameters('tags')]",
             "properties": {
@@ -136,17 +136,6 @@
                 }
             },
             "resources": [
-                {
-                    "type": "config",
-                    "apiVersion": "[variables('webApiVersion')]",
-                    "name": "appsettings",
-                    "dependsOn": [
-                        "[resourceId('Microsoft.Web/sites', parameters('appServiceName'))]"
-                    ],
-                    "properties": {
-                        "WEBSITE_VNET_ROUTE_ALL": "1"
-                    }
-                },
                 {
                     "type": "sourcecontrols",
                     "apiVersion": "[variables('webApiVersion')]",
@@ -165,11 +154,25 @@
                     "type": "networkConfig",
                     "apiVersion": "[variables('webApiVersion')]",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Web/sites', parameters('appServiceName'))]"
+                        "[resourceId('Microsoft.Web/sites', parameters('appServiceName'))]",
+                        "[concat('Microsoft.Web/sites/', parameters('appServiceName'), '/sourcecontrols/web')]"
                     ],
                     "properties": {
                         "subnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
                         "swiftSupported": true
+                    }
+                },
+                {
+                    "type": "config",
+                    "apiVersion": "[variables('webApiVersion')]",
+                    "name": "appsettings",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/sites', parameters('appServiceName'))]",
+                        "[concat('Microsoft.Web/sites/', parameters('appServiceName'), '/sourcecontrols/web')]",
+                        "[concat('Microsoft.Web/sites/', parameters('appServiceName'), '/networkConfig/virtualNetwork')]"                        
+                    ],
+                    "properties": {
+                        "WEBSITE_VNET_ROUTE_ALL": "1"
                     }
                 }
             ]
