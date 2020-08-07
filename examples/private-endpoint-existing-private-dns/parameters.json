@@ -20,6 +20,12 @@
         "subnetName": {
             "value": "<SUBNET_NAME>"
         },
+        "privateDnsZoneSubscriptionId": {
+            "value": "<SUBSCRPTION_ID OF PRIVATE DNS ZONE IF DIFFERENT FROM PRIVATE LINK ENDPOINT>"
+        },
+        "privateDnsZoneRg": {
+            "value": "<RESOURCE_GROUP_NAME OF PRIVATE DNS ZONE IF DIFFERENT FROM PRIVATE LINK ENDPOINT>"
+        },
         "privateDnsZoneName": {
             "value": "<PRIVATE_DNS_ZONE_NAME>"
         },
