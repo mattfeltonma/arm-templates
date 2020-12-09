@@ -1,0 +1,104 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "uniqueData": {
+            "type": "string",
+            "metadata": {
+                "description": "Data used to append to resources to ensure uniqueness"
+            },
+            "defaultValue": "[substring(newGuid(),0,8)]"
+        },
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "The location the resources will be created"
+            }
+        },
+        "subnetId": {
+            "type": "string",
+            "metadata": {
+                "description": "The resource id of the subnet where the private endpoint will be created"
+            }         
+        },
+        "resourceName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the resource the private endpoint is being created for"
+            }
+        },
+        "resourceIdentifier": {
+            "type": "string",
+            "metadata": {
+                "description": "The resource id of the resoure the private endpoint is being created for"
+            }         
+        },
+        "privateZoneId": {
+            "type": "string",
+            "metadata": {
+                "description": "The resource id of the private dns zone"
+            }
+        },
+        "privateEndpointSubResource": {
+            "type": "array",
+            "metadata": {
+                "description": "An array of strings of the ids of the sub-resource accessible through the private Eendpoint.  Examples include queue or blob"
+            }
+        },
+        "tags": {
+            "type": "object",
+            "metadata": {
+                "description": "The tags that will be associated to the VM"
+            }
+        }
+    },
+    "variables": {
+        "networkApiVersion": "2020-05-01",
+        "privateLinkEndpointName": "[substring(concat('pl',parameters('resourceName'),parameters('uniqueData')),0,16)]",
+        "privateLinkConnName": "[substring(concat('plconn',parameters('resourceName'),parameters('uniqueData')),0,16)]"
+    },
+    "resources": [
+       {
+            "type": "Microsoft.Network/privateEndpoints",
+            "apiVersion": "[variables('networkApiVersion')]",
+            "name": "[variables('privateLinkEndpointName')]",
+            "location": "[parameters('location')]",
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "subnet": {
+                    "id": "[parameters('subnetId')]"
+                },
+                "privateLinkServiceConnections": [
+                    {
+                        "name": "[variables('privateLinkConnName')]",
+                        "properties": {
+                            "privateLinkServiceId": "[parameters('resourceIdentifier')]",
+                            "groupIds": "[parameters('privateEndpointSubResource')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+            "apiVersion": "[variables('networkApiVersion')]",
+            "name": "[concat(variables('privateLinkEndpointName'),'/default')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateEndpoints' , variables('privateLinkEndpointName'))]"
+            ],
+            "properties": {
+                "privateDnsZoneConfigs": [
+                    {
+                        "name": "config1",
+                        "properties": {
+                            "privateDnsZoneId": "[parameters('privateZoneId')]"
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {
+    }
+}

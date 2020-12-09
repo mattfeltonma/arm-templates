@@ -2,6 +2,13 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "uniqueData": {
+            "type": "string",
+            "metadata": {
+                "description": "Data used to append to resources to ensure uniqueness"
+            },
+            "defaultValue": "[substring(newGuid(),0,8)]"
+        },
         "vmName": {
             "type": "string",
             "metadata": {
@@ -87,10 +94,9 @@
         "networkApiVersion": "2019-11-01",
         "vmApiVersion": "2019-07-01",
         "storageApiVersion": "2019-06-01",
-        "resourceDeploymentsApiVersion": "2019-10-01",
         "location": "[resourceGroup().location]",
-        "diagAcctName": "[concat('st',uniqueString(parameters('myWorkspaceId'),parameters('vmName')))]",
-        "nicName": "[concat(parameters('vmName'),uniqueString(resourceGroup().id))]",
+        "diagAcctName": "[concat('st',parameters('uniqueData'))]",
+        "nicName": "[concat(parameters('vmName'),parameters('uniqueData'))]",
         "subnetRef": "[resourceId(parameters('vnetSubscriptionId'),parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks/subnets',parameters('vnetName'),parameters('subnetName'))]"
     },
     "resources": [
@@ -160,7 +166,7 @@
                     "imageReference": {
                         "publisher": "MicrosoftWindowsServer",
                         "offer": "WindowsServer",
-                        "sku": "2016-Datacenter",
+                        "sku": "2019-Datacenter",
                         "version": "latest"
                     }
                 },
