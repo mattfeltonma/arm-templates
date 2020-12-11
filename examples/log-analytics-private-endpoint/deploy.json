@@ -70,7 +70,6 @@
         "dnsApiVersion": "2018-09-01"
     },
     "resources": [
-        /* Create Private DNS Zones */
         {
             "type": "Microsoft.Network/privateDnsZones",
             "apiVersion": "[variables('dnsApiVersion')]",
@@ -95,7 +94,6 @@
             "name": "privatelink.agentsvc.azure-automation.net",
             "location": "global"
         },
-        /* Link Private DNS Zones */
         {
             "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
             "apiVersion": "[variables('dnsApiVersion')]",
@@ -159,7 +157,6 @@
                 }
             }
         },
-        /* Create Azure Monitor Private Link Scope */
         {
             "name": "[variables('privateLinkScopeName')]",
             "type": "microsoft.insights/privateLinkScopes",
@@ -168,7 +165,6 @@
             "tags": "[parameters('tags')]",
             "properties": {}
         },
-        /* Create Azure Monitor Private Link Scope Resource */
         {
             "name": "[concat(variables('privateLinkScopeName'),'/',variables('privateLinkScopeResourceName'))]",
             "type": "microsoft.insights/privateLinkScopes/scopedResources",
@@ -180,7 +176,6 @@
                 "linkedResourceId":"[parameters('laWorkspaceResourceId')]"
             }
         },
-        /* Create Private Endpoint */
         {
             "type": "Microsoft.Network/privateEndpoints",
             "apiVersion": "[variables('networkApiVersion')]",
@@ -208,7 +203,6 @@
                 ]
             }
         },
-        /* Create Private DNS Zone Groups */
         {
             "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
             "apiVersion": "[variables('networkApiVersion')]",
