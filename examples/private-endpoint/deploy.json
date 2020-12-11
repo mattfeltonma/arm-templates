@@ -9,17 +9,37 @@
             },
             "defaultValue": "[substring(newGuid(),0,8)]"
         },
-        "location": {
+        "privateEndpointLocation": {
             "type": "string",
             "metadata": {
-                "description": "The location the resources will be created"
+                "description": "The region the private endpoint will be created in"
             }
         },
-        "subnetId": {
+        "privateEndpointVnetName": {
             "type": "string",
             "metadata": {
-                "description": "The resource id of the subnet where the private endpoint will be created"
-            }         
+                "description": "The name of the virtual network where the private endpoint will be placed"
+            }
+        },
+        "privateEndpointSubnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the subnet in the virtual network where the private endpoint will be placed"
+            }
+        },
+        "vnetResourceGroup": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the the resource group where the virtual network exists"
+            },
+            "defaultValue": "[resourceGroup().name]"
+        },
+        "vnetSubscriptionId": {
+            "type": "string",
+            "metadata": {
+                "description": "The subscription id of the subscription the virtual network exists in"
+            },
+            "defaultValue": "[subscription().subscriptionId]"
         },
         "resourceName": {
             "type": "string",
@@ -31,13 +51,27 @@
             "type": "string",
             "metadata": {
                 "description": "The resource id of the resoure the private endpoint is being created for"
-            }         
+            }
         },
-        "privateZoneId": {
+        "privateDnsZoneName": {
             "type": "string",
             "metadata": {
-                "description": "The resource id of the private dns zone"
+                "description": "The name of the private dns zone"
             }
+        },
+        "privateDnsZoneResourceGroup": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the resource group where the private dns zone exists"
+            },
+            "defaultValue": "[resourceGroup().name]"
+        },
+        "privateDnsZoneSubscription": {
+            "type": "string",
+            "metadata": {
+                "description": "The subscription id of the subscription where the private dns zone exists"
+            },
+            "defaultValue": "[subscription().subscriptionId]"
         },
         "privateEndpointSubResource": {
             "type": "array",
@@ -54,19 +88,21 @@
     },
     "variables": {
         "networkApiVersion": "2020-05-01",
+        "resourceDeploymentsApiVersion": "2019-10-01",
         "privateLinkEndpointName": "[substring(concat('pl',parameters('resourceName'),parameters('uniqueData')),0,16)]",
-        "privateLinkConnName": "[substring(concat('plconn',parameters('resourceName'),parameters('uniqueData')),0,16)]"
+        "privateLinkConnName": "[substring(concat('plconn',parameters('resourceName'),parameters('uniqueData')),0,16)]",
+        "privateEndpointIpDeploy": "deploy-getPeIp"
     },
     "resources": [
-       {
+        {
             "type": "Microsoft.Network/privateEndpoints",
             "apiVersion": "[variables('networkApiVersion')]",
             "name": "[variables('privateLinkEndpointName')]",
-            "location": "[parameters('location')]",
+            "location": "[parameters('privateEndpointLocation')]",
             "tags": "[parameters('tags')]",
             "properties": {
                 "subnet": {
-                    "id": "[parameters('subnetId')]"
+                    "id": "[resourceId(parameters('vnetSubscriptionId'),parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks/subnets',parameters('privateEndpointVnetName'),parameters('privateEndpointSubnetName'))]"
                 },
                 "privateLinkServiceConnections": [
                     {
@@ -83,7 +119,7 @@
             "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
             "apiVersion": "[variables('networkApiVersion')]",
             "name": "[concat(variables('privateLinkEndpointName'),'/default')]",
-            "location": "[parameters('location')]",
+            "location": "[parameters('privateEndpointLocation')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/privateEndpoints' , variables('privateLinkEndpointName'))]"
             ],
@@ -92,13 +128,58 @@
                     {
                         "name": "config1",
                         "properties": {
-                            "privateDnsZoneId": "[parameters('privateZoneId')]"
+                            "privateDnsZoneId": "[resourceId(parameters('privateDnsZoneSubscription'),parameters('privateDnsZoneResourceGroup'),'Microsoft.Network/privateDnsZones',parameters('privateDnsZoneName'))]"
                         }
                     }
                 ]
             }
+        },
+        {
+            "name": "[variables('privateEndpointIpDeploy')]",
+            "apiVersion": "[variables('resourceDeploymentsApiVersion')]",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateEndpoints/privateDnsZoneGroups', variables('privateLinkEndpointName'), 'default')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "expressionEvaluationOptions": {
+                    "scope": "inner"
+                },
+                "parameters": {
+                    "networkApiVersion": {
+                        "value": "[variables('networkApiVersion')]"
+                    },
+                    "privateEndpointNetworkInterface": {
+                        "value": "[reference(variables('privateLinkEndpointName')).networkInterfaces[0].id]"
+                    }
+                },
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "networkApiVersion": {
+                            "type": "string"
+                        },
+                        "privateEndpointNetworkInterface": {
+                            "type": "string"
+                        }
+                    },
+                    "resources": [],
+                    "outputs": {
+                        "privateEndpointIpAddress": {
+                            "type": "string",
+                            "value": "[reference(parameters('privateEndpointNetworkInterface'),parameters('networkApiVersion')).ipConfigurations[0].properties.privateIPAddress]"
+                        }
+                    }
+                }
+            }
         }
     ],
     "outputs": {
+        "privateEndpointIp": {
+            "type": "string",
+            "value": "[reference(variables('privateEndpointIpDeploy')).outputs.privateEndpointIpAddress.value]"
+        }
     }
 }
