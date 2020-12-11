@@ -1,5 +1,5 @@
-# Azure Virtual Machine - Windows Server 2019
-This ARM template provisions a Windows Server 2019 Azure Virtual Machine.  It is configured with the following traits:
+# Azure Virtual Machine - Windows Server 2016
+This ARM template provisions a Windows Server 2016 Azure Virtual Machine.  It is configured with the following traits:
 * Single virtual network interface set for a dynamic private IP address
 * Storage account which is used for diagnostics logging
 * Network Watcher extension installed

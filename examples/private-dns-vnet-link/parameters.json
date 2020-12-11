@@ -2,19 +2,15 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        /* The resource ID of the Virtual Network you want to link to the Private DNS Zone */
         "remoteVirtualNetworkId": {
             "value":""
         },
-        /* The name of the Private DNS Zone you to link the Virtual Network to */
         "privateDnsZoneName": {
             "value":""
         },
-        /* The name to be assigned to the Virtual Network Link */
         "virtualNetworkLinkName": {
             "value":""
         },
-        /* Enable or disable automatic registration of DNS records */
         "enableRegistration": {
             "value":false
         }

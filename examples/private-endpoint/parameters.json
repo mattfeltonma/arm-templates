@@ -1,0 +1,47 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "privateEndpointLocation": {
+            "value": "eastus"
+        },
+        "privateEndpointVnetName": {
+            "value": "myvnet"
+        },
+        "privateEndpointSubnetName": {
+            "value": "mysubnet"
+        },
+        "vnetResourceGroup": {
+            "value": "myrg"
+        },
+        "vnetSubscriptionId": {
+            "value": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+        },
+        "resourceName": {
+            "value": "mystorageaccount"
+        },
+        "resourceIdentifier": {
+            "value": "/subscriptions/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/resourceGroups/myrg/providers/Microsoft.Storage/storageAccounts/mystorageaccount"
+        },
+        "privateDnsZoneName": {
+            "value": "privatelink.blob.core.windows.net"
+        },
+        "privateDnsZoneResourceGroup": {
+            "value": "myrg"
+        },
+        "privateDnsZoneSubscription": {
+            "value": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+        },
+        "privateEndpointSubResource": {
+            "value": [
+                "blob"
+            ]
+        },
+        "tags": {
+            "value": {
+                "TAG1": "VALUE",
+                "TAG2": "VALUE"
+            }
+        }
+    }
+}
